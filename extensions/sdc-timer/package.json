@@ -48,37 +48,37 @@
     {
       "name": "toggle-timer",
       "title": "Toggle Timer",
-      "description": "",
+      "description": "Toggle the timer",
       "mode": "no-view"
     },
     {
       "name": "enter-timer",
       "title": "Enter Time",
-      "description": "",
+      "description": "Enter time manually",
       "mode": "no-view"
     },
     {
       "name": "enter-timer-form",
       "title": "Enter Timer Form",
-      "description": "",
+      "description": "The form for entering time manually",
       "mode": "view"
     },
     {
       "name": "start-timer",
       "title": "Start Timer",
-      "description": "",
+      "description": "Start a timer",
       "mode": "no-view"
     },
     {
       "name": "invoice",
       "title": "Invoice",
-      "description": "",
+      "description": "Invoice a client",
       "mode": "no-view"
     },
     {
       "name": "choose-client",
       "title": "Choose Client",
-      "description": "",
+      "description": "The form for choosing a client",
       "mode": "view"
     },
     {
