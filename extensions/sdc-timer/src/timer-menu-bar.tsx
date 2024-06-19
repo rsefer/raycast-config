@@ -25,11 +25,24 @@ export default function Command() {
 					onAction={() => stopTimer() }
 				/>
 				</>
-			: <MenuBarExtra.Item
+			:
+				<>
+				<MenuBarExtra.Item
 					title="Start Timer"
 					icon={{ source: Icon.Stopwatch, tintColor: Color.Green }}
 					onAction={() => launchCommand({ name: "choose-client", type: LaunchType.UserInitiated }) }
 				/>
+				<MenuBarExtra.Item
+					title="Enter Time"
+					icon={{ source: Icon.Pencil, tintColor: Color.Blue }}
+					onAction={() => launchCommand({ name: "enter-timer", type: LaunchType.UserInitiated }) }
+				/>
+				<MenuBarExtra.Item
+					title="Invoice"
+					icon={{ source: Icon.BankNote, tintColor: Color.Yellow }}
+					onAction={() => launchCommand({ name: "invoice", type: LaunchType.UserInitiated }) }
+				/>
+				</>
 			}
     </MenuBarExtra>
   );
