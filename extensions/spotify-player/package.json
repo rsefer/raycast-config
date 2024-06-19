@@ -136,7 +136,7 @@
         }
       ]
     },
-		{
+    {
       "name": "podcastEpisodes",
       "title": "Podcast Episodes",
       "subtitle": "Spotify",
@@ -416,7 +416,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.75.1",
+    "@raycast/api": "^1.77.0",
     "@raycast/utils": "^1.16.0",
     "node-fetch": "^3.3.2",
     "oazapfts": "^4.10.0"
