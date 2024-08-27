@@ -1,6 +1,7 @@
 import { LocalStorage, showHUD, Toast, showToast, getPreferenceValues } from "@raycast/api";
 import { Timer, Preferences } from "./types";
 import { promises as fs } from "fs";
+import { getClients } from "./get-clients";
 import moment from "moment";
 
 const storageKeys = {
@@ -74,7 +75,9 @@ export async function logTime(id: number, name: string | null, durationMinutes: 
 		`${id},${name?.replace(/[^a-z0-9]/gi, "").substring(0, 15)},${durationMinutes},${moment().format("HH:mm:ss")},${moment().format("YYYY-MM-DD")}\r\n`,
 		"utf8",
 	);
-	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes`);
+	let allClients = await getClients();
+	let thisClient = allClients.find(c => c.id == id);
+	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${thisClient.minutes} minutes.`);
 	return true;
 }
 

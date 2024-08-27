@@ -18,7 +18,7 @@ export default function Command(context: LaunchProps) {
 					<Action.SubmitForm
 						onSubmit={(values) => {
 							logTime(client.id, client.name, +values.minutes);
-							popToRoot();
+							// popToRoot();
 						}}
 					/>
 				</ActionPanel>
