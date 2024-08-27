@@ -77,7 +77,7 @@ export async function logTime(id: number, name: string | null, durationMinutes: 
 	);
 	let allClients = await getClients();
 	let thisClient = allClients.find(c => c.id == id);
-	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${thisClient.minutes} minutes.`);
+	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${formatDuration(minutesToMilliseconds(thisClient.minutes + durationMinutes), 'short')}.`);
 	return true;
 }
 
@@ -97,6 +97,10 @@ export async function getDuration(): Promise<number>{
 	return end - timer.start;
 }
 
+export function minutesToMilliseconds(minutes: number) {
+	return minutes * 60 * 1000;
+}
+
 export function formatDuration(duration: number, format: string = 'long'): string {
 	if (!duration) { duration = 0; }
 	const seconds = Math.floor(duration / 1000);
@@ -112,7 +116,6 @@ export function formatDuration(duration: number, format: string = 'long'): strin
 	return `${hoursString}${minutesString}`;
 }
 
-export async function notify(message: string, style: Toast.Style | null) {
-	// await showToast(style || Toast.Style.Success, message);
+export async function notify(message: string) {
 	await showHUD(message);
 }

@@ -4,7 +4,7 @@ import { promises as fs, read } from "fs";
 import { pipeline } from 'stream/promises';
 import { parse } from 'csv-parse';
 import axios from 'axios';
-import { formatDuration } from "./Timer";
+import { formatDuration, minutesToMilliseconds } from "./Timer";
 
 const cache = new Cache();
 
@@ -72,7 +72,7 @@ export async function assignClientMinutes(clients:Array<Client>) {
 		let foundClient = clients.find(client => client.id == clientID);
 		if (foundClient) {
 			foundClient.minutes = totalMinutes;
-			foundClient.timeFormatted = formatDuration(foundClient.minutes * 1000 * 60, 'short');
+			foundClient.timeFormatted = formatDuration(minutesToMilliseconds(foundClient.minutes), 'short');
 		}
 	}
 	return clients;
