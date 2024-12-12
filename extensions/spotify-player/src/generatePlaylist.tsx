@@ -32,7 +32,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.Genera
     ...
   ]
 }`,
-        { model: AI.Model["OpenAI_GPT4o-mini"] },
+        { model: AI.Model.OpenAI_GPT4o },
       );
       const match = data.match(/[{\\[]{1}([,:{}\\[\]0-9.\-+Eaeflnr-u \n\r\t]|".*?")+[}\]]{1}/gis)?.[0];
       if (!match) {

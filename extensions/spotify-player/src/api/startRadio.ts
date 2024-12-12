@@ -21,7 +21,11 @@ export async function startRadio({ trackIds = [], artistIds = [] }: StartRadioPr
       } catch (err) {
         const error = getErrorMessage(err);
         if (error?.toLocaleLowerCase().includes("no active device")) {
-          const script = buildScriptEnsuringSpotifyIsRunning(`play track "${tracks[0].uri}"`);
+          const script = buildScriptEnsuringSpotifyIsRunning(`tell application "Spotify"
+          launch
+          delay 3
+          play track "${tracks[0].uri}"
+  end tell`);
           await runAppleScriptSilently(script);
         }
       }

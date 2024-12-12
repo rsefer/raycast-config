@@ -414,7 +414,7 @@
         }
       ]
     },
-		{
+    {
       "name": "startDJ",
       "title": "Start DJ",
       "subtitle": "Spotify",
@@ -424,17 +424,17 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.86.1",
+    "@raycast/api": "^1.87.5",
     "@raycast/utils": "^1.18.1",
     "node-fetch": "^3.3.2",
-    "oazapfts": "^4.12.0"
+    "oazapfts": "^4.10.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",
-    "@types/node": "22.10.1",
-    "@types/react": "18.3.12",
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.1",
     "eslint": "^9.16.0",
-    "prettier": "^3.4.1",
+    "prettier": "^3.4.2",
     "typescript": "^5.7.2"
   },
   "scripts": {

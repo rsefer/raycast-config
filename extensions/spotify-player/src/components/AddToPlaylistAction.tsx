@@ -15,7 +15,7 @@ export function AddToPlaylistAction({ playlists, meData, uri }: AddToPlaylistAct
   return (
     <ActionPanel.Submenu icon={Icon.List} title="Add to Playlist">
       {playlists
-        ?.filter((playlist) => playlist.owner?.id === meData?.id)
+        ?.filter((playlist) => playlist?.owner?.id === meData?.id)
         .map((playlist) => {
           return (
             <Action
