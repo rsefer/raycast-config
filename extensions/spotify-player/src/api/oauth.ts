@@ -2,7 +2,8 @@ import { OAuth } from "@raycast/api";
 import fetch from "node-fetch";
 import { URLSearchParams } from "url";
 
-const clientId = "7bbb789c01ff44ed842907b7a80c404f";
+// const clientId = "7bbb789c01ff44ed842907b7a80c404f"; // original
+const clientId = "70d8d7021f0141419953c7c6570b20a9"; // rsefer
 
 const scope = [
   "playlist-modify-private",
@@ -12,6 +13,7 @@ const scope = [
   "user-follow-read",
   "user-library-modify",
   "user-library-read",
+  "user-read-playback-position",
   "user-modify-playback-state",
   "user-read-currently-playing",
   "user-read-playback-state",
