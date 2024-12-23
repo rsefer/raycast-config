@@ -36,6 +36,7 @@ export function useFullShowEpisodes(options: UseFullShowEpisodesProps = {}) {
 
   if (savedEpisodesData.items?.length > 0) {
     savedEpisodesData.items = savedEpisodesData?.items.sort(sortPlayedAndDateChrono);
+		savedEpisodesData.items = savedEpisodesData?.items.filter(e => e.id);
   }
 
   if (combinedSortedEpisodesData.items?.length > 0) {
