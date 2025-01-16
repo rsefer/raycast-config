@@ -1,4 +1,5 @@
 import { LocalStorage, showHUD, Toast, showToast, getPreferenceValues } from "@raycast/api";
+import { exec } from "child_process";
 import { Timer, Preferences } from "./types";
 import { promises as fs } from "fs";
 import { getClients } from "./get-clients";
@@ -23,6 +24,7 @@ export async function startTimer(id: number | string, name: string | null = null
 			long: formatDuration(0, 'long')
 		}
 	};
+	await toggleASFocusMode();
 	await LocalStorage.setItem(storageKeys.timer, JSON.stringify(timer));
 	await LocalStorage.setItem(storageKeys.notifications, JSON.stringify([]));
 	await notify(`🕐 Started ${timer.name}`);
@@ -62,10 +64,23 @@ export async function stopTimer(): Promise<Timer | null> {
 		return null;
 	}
 	timer.end = new Date().getTime();
+	await toggleASFocusMode();
 	await LocalStorage.removeItem(storageKeys.timer);
 	await LocalStorage.removeItem(storageKeys.notifications);
 	await logTime(timer.id, timer.name, timer.diffMinutes || 0);
 	return timer;
+}
+
+export async function toggleASFocusMode(): Promise<null> {
+	exec("shortcuts run \"Toggle Work Focus Mode\"", (error, stdout, stderr) => {
+		if (error) {
+			return;
+		}
+		if (stderr) {
+			return;
+		}
+	});
+	return null;
 }
 
 export async function logTime(id: number, name: string | null, durationMinutes: number): Promise<Boolean> {
