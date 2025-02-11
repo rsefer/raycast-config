@@ -56,14 +56,14 @@ export function useFullShowEpisodes(options: UseFullShowEpisodesProps = {}) {
 
 function sortPlayedAndDateReverseChrono(a, b) {
   return (
-    (a.resume_point?.fully_played === b.resume_point?.fully_played ? 0 : a.resume_point?.fully_played ? 1 : -1) ||
-    new Date(b.release_date) - new Date(a.release_date)
+    (a?.resume_point?.fully_played === b?.resume_point?.fully_played ? 0 : a?.resume_point?.fully_played ? 1 : -1) ||
+    new Date(b?.release_date) - new Date(a?.release_date)
   );
 }
 
 function sortPlayedAndDateChrono(a, b) {
   return (
-    (a.resume_point?.fully_played === b.resume_point?.fully_played ? 0 : a.resume_point?.fully_played ? 1 : -1) ||
-    new Date(a.release_date) - new Date(b.release_date)
+    (a?.resume_point?.fully_played === b?.resume_point?.fully_played ? 0 : a?.resume_point?.fully_played ? 1 : -1) ||
+    new Date(a?.release_date) - new Date(b?.release_date)
   );
 }

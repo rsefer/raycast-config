@@ -9,6 +9,7 @@ type EpisodeListItemProps = {
 };
 
 export default function EpisodeListItem({ episode, show }: EpisodeListItemProps) {
+	if (!episode) return null;
   const title = episode.name || "";
 
   let icon: Image.ImageLike | undefined = undefined;
