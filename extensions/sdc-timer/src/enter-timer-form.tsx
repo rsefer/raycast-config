@@ -1,10 +1,29 @@
 import { LaunchProps, Form, popToRoot, ActionPanel, Action, getPreferenceValues } from "@raycast/api";
 import { logTime, formatDuration, minutesToMilliseconds } from "./Timer";
+import { useForm, FormValidation } from "@raycast/utils";
 
 const preferences = getPreferenceValues<Preferences>();
 
+interface SignUpFormValues {
+  minutes: number;
+}
+
 export default function Command(context: LaunchProps) {
 	let client = context.launchContext?.client;
+	const { handleSubmit, itemProps } = useForm<SignUpFormValues>({
+    onSubmit(values) {
+      logTime(client.id, client.name, +values.minutes);
+    },
+    validation: {
+      minutes: (value) => {
+        if (!value || +value != value) {
+          return "Must be an integer.";
+        } else if (!value) {
+					return "Minutes required.";
+				}
+      }
+    }
+  });
   return (
 		<Form
 			searchBarAccessory={
@@ -16,10 +35,7 @@ export default function Command(context: LaunchProps) {
 			actions={
 				<ActionPanel>
 					<Action.SubmitForm
-						onSubmit={(values) => {
-							logTime(client.id, client.name, +values.minutes);
-							// popToRoot();
-						}}
+						onSubmit={handleSubmit}
 					/>
 				</ActionPanel>
 			}
@@ -34,10 +50,11 @@ export default function Command(context: LaunchProps) {
 			/>
 			<Form.Separator />
 			<Form.TextField
-				id="minutes"
 				title="Minutes"
 				placeholder="60"
+				defaultValue="60"
 				autoFocus={true}
+				{...itemProps.minutes}
 			/>
 		</Form>
   );
