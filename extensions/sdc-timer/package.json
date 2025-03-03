@@ -90,20 +90,27 @@
       "interval": "10s"
     }
   ],
+  "tools": [
+    {
+      "name": "generate-invoice-links",
+      "title": "Generate Invoice Links",
+      "description": "Generates relevant invoice links"
+    }
+  ],
   "dependencies": {
-    "@raycast/api": "^1.81.2",
-    "@raycast/utils": "^1.16.5",
-    "axios": "^1.7.5",
-    "csv-parse": "^5.5.6",
+    "@raycast/api": "^1.93.0",
+    "@raycast/utils": "^1.19.0",
+    "axios": "^1.8.1",
+    "csv-parse": "^5.6.0",
     "moment": "^2.30.1"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.11",
-    "@types/node": "^22.5.0",
-    "@types/react": "^18.3.4",
-    "eslint": "^9.9.1",
-    "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "@types/node": "^22.13.8",
+    "@types/react": "^19.0.10",
+    "eslint": "^9.21.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
   },
   "scripts": {
     "build": "ray build -e dist",

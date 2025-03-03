@@ -70,9 +70,11 @@ export async function assignClientMinutes(clients:Array<Client>) {
 		let relevantRows = rawRows.filter(client => +client['client id'] == clientID);
 		let totalMinutes = relevantRows.reduce((sum, client) => sum + +client.minutes, 0);
 		let foundClient = clients.find(client => client.id == clientID);
+		let lastEntry = relevantRows[relevantRows.length - 1];
 		if (foundClient) {
 			foundClient.minutes = totalMinutes;
 			foundClient.timeFormatted = formatDuration(minutesToMilliseconds(foundClient.minutes), 'short');
+			foundClient.lastEntryDateTime = `${lastEntry.date} ${lastEntry.timestamp}`;
 		}
 	}
 	return clients;
