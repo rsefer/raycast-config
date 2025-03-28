@@ -32,7 +32,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.Genera
     ...
   ]
 }`,
-        { model: AI.Model.OpenAI_GPT4o },
+        { model: AI.Model["OpenAI_GPT4o-mini"] },
       );
       const match = data.match(/[{\\[]{1}([,:{}\\[\]0-9.\-+Eaeflnr-u \n\r\t]|".*?")+[}\]]{1}/gis)?.[0];
       if (!match) {
@@ -68,7 +68,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.Genera
       await showToast({ style: Toast.Style.Animated, title: "Adding playlist to Spotify" });
       const spotifyPlaylist = await createPlaylist({
         name: playlist.name,
-        description: playlist?.description,
+        description: playlist.description,
       });
       if (spotifyPlaylist?.id) {
         const trackUris = (tracks?.map((track) => track?.uri).filter(Boolean) as string[]) ?? [];

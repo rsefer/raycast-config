@@ -9,13 +9,13 @@ type EpisodesSectionProps = {
 };
 
 export function EpisodesSection({ episodes, limit, title = "Episodes" }: EpisodesSectionProps) {
-  if (!episodes || episodes.length == 0) return null;
+  if (!episodes) return null;
 
   const items = episodes.slice(0, limit || episodes.length);
 
   return (
     <List.Section title={title}>
-      {items?.map((episode) => <EpisodeListItem key={episode?.id} episode={episode} />)}
+      {items?.map((episode) => <EpisodeListItem key={episode.id} episode={episode} />)}
     </List.Section>
   );
 }
