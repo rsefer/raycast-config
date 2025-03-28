@@ -34,7 +34,8 @@
     "enneemme",
     "lineville",
     "tsibog",
-    "viethung0823"
+    "viethung0823",
+	  "rsefer"
   ],
   "pastContributors": [
     "bkeys818"
@@ -219,6 +220,13 @@
           "required": false
         }
       ]
+    },
+		{
+      "name": "podcastEpisodes",
+      "title": "Podcast Episodes",
+      "subtitle": "Spotify",
+      "description": "See and control playback of recent podcast episodes",
+      "mode": "view"
     },
     {
       "name": "togglePlayPause",
