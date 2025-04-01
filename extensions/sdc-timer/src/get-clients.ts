@@ -42,6 +42,7 @@ export async function getClients(forceRefresh: Boolean = false) {
 			title: "Failed to refresh client list"
 		});
 	}
+	await assignClientMinutes(response.data);
   return response.data;
 }
 

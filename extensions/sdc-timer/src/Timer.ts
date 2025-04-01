@@ -92,7 +92,7 @@ export async function logTime(id: number, name: string | null, durationMinutes: 
 	);
 	let allClients = await getClients();
 	let thisClient = allClients.find(c => c.id == id);
-	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${formatDuration(minutesToMilliseconds((thisClient?.minutes || 0) + durationMinutes), 'short')}.`);
+	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${formatDuration(minutesToMilliseconds((thisClient?.minutes || 0)), 'short')}.`);
 	return true;
 }
 
