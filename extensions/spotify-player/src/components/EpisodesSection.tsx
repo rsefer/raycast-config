@@ -11,7 +11,7 @@ type EpisodesSectionProps = {
 export function EpisodesSection({ episodes, limit, title = "Episodes" }: EpisodesSectionProps) {
   if (!episodes) return null;
 
-  const items = episodes.slice(0, limit || episodes.length);
+  const items = episodes.slice(0, limit || episodes.length).filter(item => item !== null);
 
   return (
     <List.Section title={title}>
