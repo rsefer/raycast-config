@@ -7,7 +7,7 @@
 # @raycast.packageName Obsidian
 
 # Optional parameters:
-# @raycast.icon 📝
+# @raycast.icon ??
 
 # Documentation:
 # @raycast.author rsefer
