@@ -1,8 +1,17 @@
+import { ComponentProps, useState } from "react";
 import { LaunchProps, Action, ActionPanel, List, launchCommand, LaunchType, Icon, Color, getPreferenceValues, open, popToRoot } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { Preferences, Client } from "./types";
 import { getClients } from "./get-clients";
 import { startTimer } from "./Timer";
+
+const filters = {
+  all: "All",
+  active: "Active",
+  archived: "Archived",
+};
+
+type FilterValue = keyof typeof filters;
 
 const preferences = getPreferenceValues<Preferences>();
 
@@ -11,8 +20,15 @@ export default function Command(context: LaunchProps) {
 	if (context.launchContext?.timerType) {
 		workingTimerType = context.launchContext.timerType;
 	}
+	const [searchText, setSearchText] = useState("");
+  const [searchFilter, setSearchFilter] = useState<FilterValue>( 'active');
   let { data, isLoading } = usePromise(getClients);
 	if (data) {
+		if (searchFilter == 'active') {
+			data = data.filter((client: Client) => !client.archived!);
+		} else if (searchFilter == 'archived') {
+			data = data.filter((client: Client) => client.archived!);
+		}
 		for (var client of data) {
 			client.accessories = [];
 			if (client.minutes) {
@@ -33,10 +49,29 @@ export default function Command(context: LaunchProps) {
 			}
 		}
 	}
+
+	const sharedProps: ComponentProps<typeof List> = {
+    searchBarPlaceholder: "Search clients",
+    isLoading: isLoading,
+    searchText,
+    onSearchTextChange: setSearchText,
+    filtering: true,
+  };
+
   return (
     <List
-      isLoading={isLoading}
-			searchBarPlaceholder="Search clients..."
+      {...sharedProps}
+			searchBarAccessory={
+        <List.Dropdown
+          tooltip="Filter search"
+          value={searchFilter}
+          onChange={(newValue) => setSearchFilter(newValue as FilterValue)}
+        >
+          {Object.entries(filters).map(([value, label]) => (
+            <List.Dropdown.Item key={value} title={label} value={value} />
+          ))}
+        </List.Dropdown>
+      }
     >
       {data?.map((item: Client, index: number) => (
         <List.Item

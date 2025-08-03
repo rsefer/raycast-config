@@ -15,6 +15,7 @@ export type Client = {
 	minutes: number;
 	timeFormatted: string;
 	lastEntryDateTime: string;
+	archived?: boolean;
 	accessories: Array<any>;
 };
 
