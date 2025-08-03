@@ -14,6 +14,7 @@ export type Client = {
 	site_url: string;
 	minutes: number;
 	timeFormatted: string;
+	mostRecentActivityDate: string;
 	lastEntryDateTime: string;
 	archived?: boolean;
 	accessories: Array<any>;

@@ -23,11 +23,14 @@ export default function Command(context: LaunchProps) {
 	const [searchText, setSearchText] = useState("");
   const [searchFilter, setSearchFilter] = useState<FilterValue>( 'active');
   let { data, isLoading } = usePromise(getClients);
+	const ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
+	const YEARS_AGO = 2;
+	const PAST_COMPARISON = new Date(Date.now() - ONE_YEAR * YEARS_AGO);
 	if (data) {
 		if (searchFilter == 'active') {
-			data = data.filter((client: Client) => !client.archived!);
+			data = data.filter((client: Client) => new Date(client.mostRecentActivityDate) > PAST_COMPARISON);
 		} else if (searchFilter == 'archived') {
-			data = data.filter((client: Client) => client.archived!);
+			data = data.filter((client: Client) => new Date(client.mostRecentActivityDate) <= PAST_COMPARISON);
 		}
 		for (var client of data) {
 			client.accessories = [];
