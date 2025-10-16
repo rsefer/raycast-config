@@ -230,6 +230,14 @@
       "mode": "view"
     },
     {
+      "name": "sync-podcast-episodes",
+      "title": "Sync Podcast Episodes",
+      "subtitle": "Spotify",
+      "description": "Background sync of podcast episode data",
+      "mode": "no-view",
+      "interval": "1h"
+    },
+    {
       "name": "togglePlayPause",
       "title": "Toggle Play/Pause",
       "subtitle": "Spotify",
