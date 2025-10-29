@@ -1,3 +1,4 @@
+import { showToast, Toast } from "@raycast/api";
 import { getErrorMessage } from "../helpers/getError";
 import { SimplifiedEpisodeObject } from "../helpers/spotify.api";
 import { getSpotifyClient } from "../helpers/withSpotifyClient";
@@ -10,27 +11,56 @@ export async function getMySavedShowsEpisodes({ limitPerShow = 3 }: GetMySavedSh
 
   try {
     const episodes = [];
-    const shows = await spotifyClient.getMeShows({ limit: 50 });
-    if (shows?.items?.length > 0) {
-      for (const show of shows?.items) {
+		let showItems = [];
+		let currentlyPaging = true;
+		let showsOffset = 0;
+		let showsLimit = 1;
+		while (currentlyPaging) {
+			let tmpShows;
+			try {
+				tmpShows = await spotifyClient.getMeShows({ limit: showsLimit, offset: showsOffset });
+				if (tmpShows.items?.length ) {
+					showItems = showItems.concat(tmpShows.items);
+				}
+				if (tmpShows.next) {
+					const url = new URL(tmpShows.next);
+					showsOffset = parseInt(url.searchParams.get('offset'));
+					showsLimit = parseInt(url.searchParams.get('limit'));
+					await new Promise((resolve) => setTimeout(resolve, 1 * 1000));
+				} else {
+					currentlyPaging = false;
+				}
+			} catch (err) {
+				showsOffset++;
+			}
+		}
+
+    if (showItems?.length > 0) {
+      for (const show of showItems) {
 				try {
 					const audiobook = await spotifyClient.getAudiobooksById(show.show?.id);
 					continue; // is audiobook, so skip
 				} catch (err) {
 					// Is not audiobook, so this audiobook call errors. Keep going
 				}
-				const showEpisodes = await getShowEpisodes({ showId: show.show?.id, limit: limitPerShow });
+
+				try {
+					const showEpisodes = await getShowEpisodes({ showId: show.show?.id, limit: limitPerShow });
 					if (showEpisodes.items?.length > 0) {
 						for (const episode of showEpisodes.items) {
 							episodes.push(episode);
 						}
 					}
+				} catch (err) {
+					// Continue with next show if this one fails
+					continue;
+				}
       }
     }
     return { items: episodes as SimplifiedEpisodeObject[] };
   } catch (err) {
     const error = getErrorMessage(err);
-    console.log("GetMySavedShowsEpisodes.ts Error:", error);
+		console.log("GetMySavedShowsEpisodes.ts Error:", error);
     throw new Error(error);
   }
 }
