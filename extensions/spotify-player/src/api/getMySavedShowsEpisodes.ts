@@ -47,7 +47,19 @@ export async function getMySavedShowsEpisodes({ limitPerShow = 3 }: GetMySavedSh
 				try {
 					const showEpisodes = await getShowEpisodes({ showId: show.show?.id, limit: limitPerShow });
 					if (showEpisodes.items?.length > 0) {
+						const oldEpisodeThreshold = new Date();
+						oldEpisodeThreshold.setDate(oldEpisodeThreshold.getDate() - 7);
+
 						for (const episode of showEpisodes.items) {
+							// Skip episodes that are fully played and older than 2 weeks
+							const episodeDate = new Date(episode.release_date);
+							const isFullyPlayed = episode.resume_point?.fully_played === true;
+							const isOlderThanTwoWeeks = episodeDate < oldEpisodeThreshold;
+
+							if (isFullyPlayed && isOlderThanTwoWeeks) {
+								continue;
+							}
+
 							episodes.push(episode);
 						}
 					}
