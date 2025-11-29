@@ -14,7 +14,7 @@ export async function getMySavedShowsEpisodes({ limitPerShow = 3 }: GetMySavedSh
 		let showItems = [];
 		let currentlyPaging = true;
 		let showsOffset = 0;
-		let showsLimit = 1;
+		let showsLimit = 5;
 		while (currentlyPaging) {
 			let tmpShows;
 			try {
@@ -26,7 +26,7 @@ export async function getMySavedShowsEpisodes({ limitPerShow = 3 }: GetMySavedSh
 					const url = new URL(tmpShows.next);
 					showsOffset = parseInt(url.searchParams.get('offset'));
 					showsLimit = parseInt(url.searchParams.get('limit'));
-					await new Promise((resolve) => setTimeout(resolve, 1 * 1000));
+					await new Promise((resolve) => setTimeout(resolve, 1 * 500));
 				} else {
 					currentlyPaging = false;
 				}

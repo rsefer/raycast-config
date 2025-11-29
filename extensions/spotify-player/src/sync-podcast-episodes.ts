@@ -15,7 +15,7 @@ async function syncPodcastEpisodes() {
     const subscribedCount = subscribedEpisodes?.items?.length || 0;
     const savedCount = savedEpisodes?.items?.length || 0;
     const totalCount = subscribedCount + savedCount;
-    return `Synced ${totalCount} episodes`;
+    return `Synced ${totalCount} episodes @ ${new Date().toLocaleTimeString()}`;
   } catch (error) {
     console.error("Error syncing podcast episodes:", error);
     return "Sync failed";
