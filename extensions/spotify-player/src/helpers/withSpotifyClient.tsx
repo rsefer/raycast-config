@@ -71,9 +71,10 @@ export async function setSpotifyClient() {
 
 async function checkNetworkConnectivity() {
   try {
-		await fetch('https://developer.spotify.com', { method: 'HEAD', mode: 'no-cors' });
+		const fetched = await nodeFetch('https://api.spotify.com');
     return true;
   } catch (error) {
+		console.error(error);
     return false;
   }
 }
