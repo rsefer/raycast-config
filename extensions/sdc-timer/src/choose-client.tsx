@@ -2,6 +2,7 @@ import { ComponentProps, useState } from "react";
 import { LaunchProps, Action, ActionPanel, List, launchCommand, LaunchType, Icon, Color, getPreferenceValues, open, popToRoot } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { Preferences, Client } from "./types";
+import { openHoursFile } from "./open-hours-file";
 import { getClients } from "./get-clients";
 import { startTimer } from "./Timer";
 
@@ -129,6 +130,12 @@ function Actions(props: { item: Client, timerType: String }) {
 					icon={{ source: Icon.RotateClockwise }}
 					shortcut={{ modifiers: ["cmd"], key: "r" }}
 					onAction={() => getClients(true) }
+				/>
+				<Action
+					title="Open Hours File"
+					icon={{ source: Icon.Document }}
+					shortcut={{ modifiers: ["cmd"], key: "h" }}
+					onAction={() => openHoursFile() }
 				/>
       </ActionPanel.Section>
     </ActionPanel>
