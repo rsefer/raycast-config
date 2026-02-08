@@ -76,6 +76,22 @@
           "required": false
         }
       ]
+    },
+    {
+      "name": "start-discover-weekly",
+      "title": "Start Discover Weekly",
+      "description": "Play the Discover Weekly playlist",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "playlistId",
+          "description": "Spotify Playlist ID",
+          "type": "textfield",
+          "placeholder": "e.g., 37i9dQZEVXcVtTQ6a45WtP",
+					"default": "37i9dQZEVXcVtTQ6a45WtP",
+          "required": false
+        }
+      ]
     }
   ],
   "dependencies": {
