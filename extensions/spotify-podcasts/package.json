@@ -27,19 +27,26 @@
       "title": "Recent Episodes",
       "description": "Show the latest episodes from your saved shows",
       "mode": "view"
+    },
+    {
+      "name": "refresh-data",
+      "title": "Refresh Spotify Data",
+      "description": "Automatically refresh Spotify podcasts data",
+      "mode": "no-view",
+      "interval": "15m"
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.102.3",
-    "@raycast/utils": "^2.2.0"
+    "@raycast/api": "^1.104.5",
+    "@raycast/utils": "^2.2.2"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^2.0.4",
-    "@types/node": "^24.1.0",
-    "@types/react": "^19.1.9",
-    "eslint": "^9.32.0",
-    "prettier": "^3.6.2",
-    "typescript": "^5.9.2"
+    "@raycast/eslint-config": "^2.1.1",
+    "@types/node": "^25.2.2",
+    "@types/react": "^19.2.13",
+    "eslint": "^10.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "ray build -e dist",
