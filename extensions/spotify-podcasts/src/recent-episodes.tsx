@@ -5,7 +5,7 @@ import { getEpisodesDetails } from "./api/episode-details";
 import { getShowEpisodes, SimplifiedEpisode } from "./api/show-episodes";
 import { getAllUserEpisodes } from "./api/user-episodes";
 import { getAllUserShows, SimplifiedShow } from "./api/user-shows";
-import { playSpotifyUri } from "./helpers/spotify-applescript";
+import { openSpotifyUri, playSpotifyUri } from "./helpers/spotify-applescript";
 
 type EpisodeListItem = {
   episode: SimplifiedEpisode;
@@ -174,19 +174,59 @@ export default function RecentEpisodesCommand() {
   }, []);
 
   const sortedSavedEpisodes = useMemo(() => {
-    return [...state.savedEpisodes].sort((a, b) => {
-      const aDate = a.episode.release_date ? new Date(a.episode.release_date).getTime() : 0;
-      const bDate = b.episode.release_date ? new Date(b.episode.release_date).getTime() : 0;
-      return bDate - aDate;
-    });
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return [...state.savedEpisodes]
+      .filter((item) => {
+        // Exclude episodes that are fully played AND older than 1 month
+        const isFullyPlayed = item.episode.resume_point?.fully_played;
+        const releaseDate = item.episode.release_date ? new Date(item.episode.release_date) : null;
+        const isOlderThanMonth = releaseDate ? releaseDate < oneMonthAgo : false;
+
+        return !(isFullyPlayed && isOlderThanMonth);
+      })
+      .sort((a, b) => {
+        // First, prioritize unfinished episodes
+        const aFinished = a.episode.resume_point?.fully_played ?? false;
+        const bFinished = b.episode.resume_point?.fully_played ?? false;
+        if (aFinished !== bFinished) {
+          return aFinished ? 1 : -1; // Unfinished first
+        }
+
+        // Then sort by date (newest first)
+        const aDate = a.episode.release_date ? new Date(a.episode.release_date).getTime() : 0;
+        const bDate = b.episode.release_date ? new Date(b.episode.release_date).getTime() : 0;
+        return bDate - aDate;
+      });
   }, [state.savedEpisodes]);
 
   const sortedRecentEpisodes = useMemo(() => {
-    return [...state.recentEpisodes].sort((a, b) => {
-      const aDate = a.episode.release_date ? new Date(a.episode.release_date).getTime() : 0;
-      const bDate = b.episode.release_date ? new Date(b.episode.release_date).getTime() : 0;
-      return bDate - aDate;
-    });
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    return [...state.recentEpisodes]
+      .filter((item) => {
+        // Exclude episodes that are fully played AND older than 1 month
+        const isFullyPlayed = item.episode.resume_point?.fully_played;
+        const releaseDate = item.episode.release_date ? new Date(item.episode.release_date) : null;
+        const isOlderThanMonth = releaseDate ? releaseDate < oneMonthAgo : false;
+
+        return !(isFullyPlayed && isOlderThanMonth);
+      })
+      .sort((a, b) => {
+        // First, prioritize unfinished episodes
+        const aFinished = a.episode.resume_point?.fully_played ?? false;
+        const bFinished = b.episode.resume_point?.fully_played ?? false;
+        if (aFinished !== bFinished) {
+          return aFinished ? 1 : -1; // Unfinished first
+        }
+
+        // Then sort by date (newest first)
+        const aDate = a.episode.release_date ? new Date(a.episode.release_date).getTime() : 0;
+        const bDate = b.episode.release_date ? new Date(b.episode.release_date).getTime() : 0;
+        return bDate - aDate;
+      });
   }, [state.recentEpisodes]);
 
   const emptyTitle = state.error ? "Unable to load episodes" : "No recent episodes";
@@ -226,15 +266,22 @@ export default function RecentEpisodesCommand() {
             {episode.uri ? (
               <Action
                 title="Play in Spotify"
-                icon={Icon.Music}
+                icon={Icon.Play}
                 onAction={() => void playSpotifyUri(episode.uri!)}
               />
             ) : null}
+						{episode.uri ? (
+							<Action
+								title="Open in Spotify"
+								icon={Icon.Music}
+								onAction={() => void openSpotifyUri(episode.uri!)}
+							/>
+						) : null}
             {episode.external_urls?.spotify ? (
               <Action.OpenInBrowser title="Open in Web Browser" url={episode.external_urls.spotify} />
             ) : null}
             {showUrl ? (
-              <Action.OpenInBrowser title="Open Show in Spotify" url={showUrl} />
+              <Action.OpenInBrowser title="Open Show in Web Browser" url={showUrl} />
             ) : null}
             <Action
               title="Refresh"
