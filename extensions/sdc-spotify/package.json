@@ -29,6 +29,12 @@
       "mode": "view"
     },
     {
+      "name": "search-spotify",
+      "title": "Search Spotify",
+      "description": "Search all of Spotify",
+      "mode": "view"
+    },
+    {
       "name": "refresh-data",
       "title": "Refresh Spotify Data",
       "description": "Automatically refresh Spotify podcasts data",
