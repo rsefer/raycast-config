@@ -167,7 +167,7 @@ export default function SearchSpotifyCommand() {
       {state.results.length === 0 && !state.isLoading && (
         <List.EmptyView
           title="No results"
-          description="Search for songs, artists, albums, playlists, shows, or episodes"
+          description="Search Spotify"
         />
       )}
     </List>
