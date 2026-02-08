@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "spotify-podcasts",
-  "title": "Spotify Podcasts",
-  "description": "Lists and plays Spotify podcasts.",
+  "name": "sdc-spotify",
+  "title": "SDC Spotify",
+  "description": "Spotify utilities.",
   "icon": "icon.png",
   "author": "rsefer",
   "categories": [
@@ -24,7 +24,7 @@
     },
     {
       "name": "recent-episodes",
-      "title": "Recent Episodes",
+      "title": "Recent Podcast Episodes",
       "description": "Show the latest episodes from your saved shows",
       "mode": "view"
     },
