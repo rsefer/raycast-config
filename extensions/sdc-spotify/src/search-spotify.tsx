@@ -30,8 +30,22 @@ const TYPE_LABELS: Record<string, string> = {
   episode: "Episodes",
 };
 
+const filters = {
+  all: "All",
+  track: "Tracks",
+  artist: "Artists",
+  album: "Albums",
+  show: "Podcasts",
+  episode: "Episodes",
+  audiobook: "Audiobooks",
+  playlist: "Playlists",
+} as const;
+
+type FilterValue = keyof typeof filters;
+
 export default function SearchSpotifyCommand() {
   const [state, setState] = useState<ViewState>({ isLoading: false, results: [] });
+  const [typeFilter, setTypeFilter] = useState<FilterValue>("all");
   const debounceTimerRef = useRef<NodeJS.Timeout>();
 
   const handleSearch = useCallback(async (query: string) => {
@@ -124,14 +138,27 @@ export default function SearchSpotifyCommand() {
     (a, b) => (TYPE_ORDER[a] ?? 999) - (TYPE_ORDER[b] ?? 999)
   );
 
+  const filteredTypes = sortedTypes.filter((type) => typeFilter === "all" || typeFilter === type);
+
   return (
     <List
       isLoading={state.isLoading}
       onSearchTextChange={handleSearch}
       searchBarPlaceholder="Search Spotify..."
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip="Filter by type"
+          value={typeFilter}
+          onChange={(newValue) => setTypeFilter(newValue as FilterValue)}
+        >
+          {Object.entries(filters).map(([value, label]) => (
+            <List.Dropdown.Item key={value} title={label} value={value} />
+          ))}
+        </List.Dropdown>
+      }
       throttle
     >
-      {sortedTypes.map((type) => (
+      {filteredTypes.map((type) => (
         <List.Section key={type} title={TYPE_LABELS[type] || type}>
           {groupedResults[type]?.slice(0, 5).map((result) => (
             <List.Item
