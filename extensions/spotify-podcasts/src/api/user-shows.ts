@@ -6,7 +6,6 @@ const AUDIOBOOKS_LOOKUP_LIMIT = 50;
 export type SimplifiedShow = {
 	id: string;
 	name: string;
-	publisher?: string;
 	description?: string;
 	html_description?: string;
 	total_episodes?: number;
@@ -14,7 +13,6 @@ export type SimplifiedShow = {
 	media_type?: string;
 	is_externally_hosted?: boolean;
 	languages?: string[];
-	available_markets?: string[];
 	images?: { url: string; height?: number; width?: number }[];
 	external_urls?: { spotify?: string };
 	uri?: string;
@@ -56,10 +54,6 @@ type FetchPageOptions = {
 	url?: string;
 };
 
-type AudiobooksResponse = {
-	audiobooks?: ({ id: string } | null)[];
-};
-
 function chunkArray<T>(items: T[], size: number) {
 	const chunks: T[][] = [];
 
@@ -74,23 +68,30 @@ async function getAudiobookIds(accessToken: string, ids: string[]) {
 	const audiobookIds = new Set<string>();
 	const chunks = chunkArray(ids, AUDIOBOOKS_LOOKUP_LIMIT);
 
+	// The batch endpoint GET /audiobooks?ids=... is being removed
+	// Use individual GET /audiobooks/{id} calls instead
 	for (const chunk of chunks) {
-		const url = `https://api.spotify.com/v1/audiobooks?ids=${chunk.join(",")}`;
-		const response = await fetch(url, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
+		const promises = chunk.map(async (audiobookId) => {
+			const url = `https://api.spotify.com/v1/audiobooks/${encodeURIComponent(audiobookId)}`;
+			const response = await fetch(url, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			});
+
+			if (!response.ok) {
+				// Item is not an audiobook or not available
+				return null;
+			}
+
+			const data = (await response.json()) as { id: string };
+			return data.id;
 		});
 
-		if (!response.ok) {
-			const body = await response.text();
-			throw new Error(`Spotify /audiobooks lookup failed: ${response.status} ${body}`);
-		}
-
-		const data = (await response.json()) as AudiobooksResponse;
-		for (const audiobook of data.audiobooks ?? []) {
-			if (audiobook?.id) {
-				audiobookIds.add(audiobook.id);
+		const results = await Promise.all(promises);
+		for (const id of results) {
+			if (id) {
+				audiobookIds.add(id);
 			}
 		}
 	}

@@ -5,10 +5,6 @@ type EpisodeDetail = SimplifiedEpisode & {
   resume_point?: { fully_played?: boolean; resume_position_ms?: number };
 };
 
-type EpisodesDetailsResponse = {
-  episodes?: (EpisodeDetail | null)[];
-};
-
 const BATCH_SIZE = 50;
 
 function chunkArray<T>(items: T[], size: number) {
@@ -31,23 +27,29 @@ export async function getEpisodesDetails(episodeIds: string[]): Promise<Map<stri
   const chunks = chunkArray(uniqueIds, BATCH_SIZE);
   const results = new Map<string, EpisodeDetail>();
 
+  // The batch endpoint GET /episodes?ids=... is being removed
+  // Use individual GET /episodes/{id} calls instead
   for (const chunk of chunks) {
-    const url = `https://api.spotify.com/v1/episodes?ids=${chunk.join(",")}`;
+    const promises = chunk.map(async (episodeId) => {
+      const url = `https://api.spotify.com/v1/episodes/${encodeURIComponent(episodeId)}`;
 
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        // Skip episodes that fail (e.g., not available in market)
+        return null;
+      }
+
+      return (await response.json()) as EpisodeDetail;
     });
 
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Spotify /episodes lookup failed: ${response.status} ${body}`);
-    }
+    const episodes = await Promise.all(promises);
 
-    const data = (await response.json()) as EpisodesDetailsResponse;
-
-    for (const episode of data.episodes ?? []) {
+    for (const episode of episodes) {
       if (episode?.id) {
         results.set(episode.id, episode);
       }
