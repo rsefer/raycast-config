@@ -46,6 +46,36 @@
       "title": "Start DJ",
       "description": "Play the DJ playlist",
       "mode": "no-view"
+    },
+    {
+      "name": "skip-backward",
+      "title": "Skip Backward",
+      "description": "Skip backward in the current track",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "skipBackwardSeconds",
+          "description": "Number of seconds to skip backward",
+          "type": "textfield",
+          "default": "15",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "skip-forward",
+      "title": "Skip Forward",
+      "description": "Skip forward in the current track",
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "skipForwardSeconds",
+          "description": "Number of seconds to skip forward",
+          "type": "textfield",
+          "default": "15",
+          "required": false
+        }
+      ]
     }
   ],
   "dependencies": {

@@ -1,7 +1,7 @@
 import { closeMainWindow } from "@raycast/api";
 import { runAppleScript } from "@raycast/utils";
 
-function buildScriptEnsuringSpotifyIsRunning(commandsToRunAfterSpotifyIsRunning: string): string {
+export function buildScriptEnsuringSpotifyIsRunning(commandsToRunAfterSpotifyIsRunning: string): string {
   return `
     tell application "Spotify"
       if not application "Spotify" is running then
@@ -19,7 +19,7 @@ function buildScriptEnsuringSpotifyIsRunning(commandsToRunAfterSpotifyIsRunning:
     end tell`;
 }
 
-async function runAppleScriptSilently(appleScript: string) {
+export async function runAppleScriptSilently(appleScript: string) {
   await closeMainWindow();
   await runAppleScript(appleScript);
 }
