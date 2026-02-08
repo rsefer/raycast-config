@@ -40,6 +40,12 @@
       "description": "Automatically refresh Spotify podcasts data",
       "mode": "no-view",
       "interval": "15m"
+    },
+    {
+      "name": "start-dj",
+      "title": "Start DJ",
+      "description": "Play the DJ playlist",
+      "mode": "no-view"
     }
   ],
   "dependencies": {
