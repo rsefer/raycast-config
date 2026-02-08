@@ -2,8 +2,8 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "spotify-podcasts",
   "title": "Spotify Podcasts",
-  "description": "Authenticate with Spotify and prepare for podcast tooling.",
-  "icon": "assets/spotify-icon.svg",
+  "description": "Lists and plays Spotify podcasts.",
+  "icon": "icon.png",
   "author": "rsefer",
   "categories": [
     "Media"

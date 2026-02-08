@@ -278,17 +278,30 @@ export default function RecentEpisodesCommand() {
 							/>
 						) : null}
             {episode.external_urls?.spotify ? (
-              <Action.OpenInBrowser title="Open in Web Browser" url={episode.external_urls.spotify} />
+              <Action.OpenInBrowser
+								title="Open in Web Browser"
+								url={episode.external_urls.spotify}
+								shortcut={{ modifiers: ["cmd"], key: "o" }}
+							/>
             ) : null}
             {showUrl ? (
-              <Action.OpenInBrowser title="Open Show in Web Browser" url={showUrl} />
+              <Action.OpenInBrowser
+								title="Open Show in Web Browser"
+								url={showUrl}
+								shortcut={{ modifiers: ["cmd"], key: "s" }}
+							/>
             ) : null}
             <Action
               title="Refresh"
               icon={Icon.ArrowClockwise}
+							shortcut={{ modifiers: ["cmd"], key: "r" }}
               onAction={() => void loadEpisodes(true)}
             />
-            <Action.CopyToClipboard title="Copy Episode Name" content={title} />
+            <Action.CopyToClipboard
+							title="Copy Episode Name"
+							content={title}
+							shortcut={{ modifiers: ["cmd"], key: "c" }}
+						/>
           </ActionPanel>
         }
       />
