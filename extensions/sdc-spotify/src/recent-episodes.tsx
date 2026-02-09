@@ -44,6 +44,10 @@ function chunkArray<T>(items: T[], size: number) {
   return chunks;
 }
 
+function isValidEpisodeItem(item: EpisodeListItem | null | undefined): item is EpisodeListItem {
+  return Boolean(item?.episode && item.episode.id && item.episode.name);
+}
+
 export default function RecentEpisodesCommand() {
   const [state, setState] = useState<ViewState>({
     isLoading: true,
@@ -59,11 +63,13 @@ export default function RecentEpisodesCommand() {
 
     if (cachedEntry) {
       cachedValue = cachedEntry.value ?? { savedEpisodes: [], recentEpisodes: [] };
+      const cachedSavedEpisodes = (cachedValue.savedEpisodes ?? []).filter(isValidEpisodeItem);
+      const cachedRecentEpisodes = (cachedValue.recentEpisodes ?? []).filter(isValidEpisodeItem);
       setState((previous) => ({
         ...previous,
         isLoading: !cacheIsFresh,
-        savedEpisodes: cachedValue?.savedEpisodes ?? [],
-        recentEpisodes: cachedValue?.recentEpisodes ?? [],
+        savedEpisodes: cachedSavedEpisodes,
+        recentEpisodes: cachedRecentEpisodes,
         error: undefined,
       }));
     }
@@ -110,12 +116,14 @@ export default function RecentEpisodesCommand() {
 
         for (const result of batchResults) {
           for (const entry of result) {
-            recentEpisodeItems.push({
-              episode: entry.episode,
-              showName: entry.show.name,
-              showUrl: entry.show.external_urls?.spotify,
-              isSaved: savedIds.has(entry.episode.id),
-            });
+            if (entry.episode?.id && entry.episode.name) {
+              recentEpisodeItems.push({
+                episode: entry.episode,
+                showName: entry.show.name,
+                showUrl: entry.show.external_urls?.spotify,
+                isSaved: savedIds.has(entry.episode.id),
+              });
+            }
           }
         }
       }
@@ -178,6 +186,7 @@ export default function RecentEpisodesCommand() {
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
     return [...state.savedEpisodes]
+      .filter(isValidEpisodeItem)
       .filter((item) => {
         // Exclude episodes that are fully played AND older than 1 month
         const isFullyPlayed = item.episode.resume_point?.fully_played;
@@ -206,6 +215,7 @@ export default function RecentEpisodesCommand() {
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
     return [...state.recentEpisodes]
+      .filter(isValidEpisodeItem)
       .filter((item) => {
         // Exclude episodes that are fully played AND older than 1 month
         const isFullyPlayed = item.episode.resume_point?.fully_played;
