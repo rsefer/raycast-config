@@ -24,7 +24,7 @@ export const oauthClient = new OAuth.PKCEClient({
   providerName: "Spotify",
   providerIcon: "spotify-icon.svg",
   description: "Connect your Spotify account",
-  providerId: "spotify",
+  providerId: "sdc-spotify",
 });
 
 export const provider = new OAuthService({
