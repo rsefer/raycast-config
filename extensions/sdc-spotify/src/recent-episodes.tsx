@@ -340,14 +340,14 @@ export default function RecentEpisodesCommand() {
         </List.Dropdown>
       }
     >
+			{showSavedSection ? (
+				<List.Section title="Saved Episodes">
+					{sortedSavedEpisodes.map((item) => renderEpisodeItem(item))}
+				</List.Section>
+			) : null}
       {showRecentSection ? (
         <List.Section title="Subscribed Episodes">
           {sortedRecentEpisodes.map((item) => renderEpisodeItem(item))}
-        </List.Section>
-      ) : null}
-      {showSavedSection ? (
-        <List.Section title="Saved Episodes">
-          {sortedSavedEpisodes.map((item) => renderEpisodeItem(item))}
         </List.Section>
       ) : null}
       {showEmptyView ? (
