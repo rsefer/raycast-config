@@ -3,7 +3,7 @@ import { LaunchProps, Action, ActionPanel, List, launchCommand, LaunchType, Icon
 import { usePromise } from "@raycast/utils";
 import { Preferences, Client } from "./types";
 import { openHoursFile } from "./open-hours-file";
-import { getClients } from "./get-clients";
+import { getClients, readCSV } from "./get-clients";
 import { startTimer } from "./Timer";
 
 const filters = {
@@ -16,6 +16,17 @@ type FilterValue = keyof typeof filters;
 
 const preferences = getPreferenceValues<Preferences>();
 
+async function getClientsFromHoursFile(): Promise<Set<number>> {
+	try {
+		const rawRows = await readCSV(preferences.hoursFile);
+		const clientIDs = new Set(rawRows.map((row: any) => +row['client id']));
+		return clientIDs;
+	} catch (error) {
+		console.error("Failed to read hours file:", error);
+		return new Set();
+	}
+}
+
 export default function Command(context: LaunchProps) {
 	let workingTimerType = 'running';
 	if (context.launchContext?.timerType) {
@@ -24,14 +35,23 @@ export default function Command(context: LaunchProps) {
 	const [searchText, setSearchText] = useState("");
   const [searchFilter, setSearchFilter] = useState<FilterValue>( 'active');
   let { data, isLoading } = usePromise(getClients);
+	let { data: clientsFromHours, isLoading: hoursLoading } = usePromise(getClientsFromHoursFile);
 	const ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
 	const YEARS_AGO = 2;
 	const PAST_COMPARISON = new Date(Date.now() - ONE_YEAR * YEARS_AGO);
 	if (data) {
 		if (searchFilter == 'active') {
-			data = data.filter((client: Client) => new Date(client.mostRecentActivityDate) > PAST_COMPARISON);
+			data = data.filter((client: Client) => {
+				const isRecentlyActive = new Date(client.mostRecentActivityDate) > PAST_COMPARISON;
+				const hasHoursEntry = clientsFromHours?.has(client.id) || false;
+				return isRecentlyActive || hasHoursEntry;
+			});
 		} else if (searchFilter == 'archived') {
-			data = data.filter((client: Client) => new Date(client.mostRecentActivityDate) <= PAST_COMPARISON);
+			data = data.filter((client: Client) => {
+				const isRecentlyActive = new Date(client.mostRecentActivityDate) > PAST_COMPARISON;
+				const hasHoursEntry = clientsFromHours?.has(client.id) || false;
+				return !isRecentlyActive && !hasHoursEntry;
+			});
 		}
 		for (var client of data) {
 			client.accessories = [];
@@ -56,7 +76,7 @@ export default function Command(context: LaunchProps) {
 
 	const sharedProps: ComponentProps<typeof List> = {
     searchBarPlaceholder: "Search clients",
-    isLoading: isLoading,
+    isLoading: isLoading || hoursLoading,
     searchText,
     onSearchTextChange: setSearchText,
     filtering: true,
