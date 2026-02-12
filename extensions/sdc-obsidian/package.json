@@ -3,7 +3,7 @@
   "name": "sdc-obsidian",
   "title": "SDC Obsidian",
   "description": "Obsidian utilities.",
-  "icon": "icon.png",
+  "icon": "icon.svg",
   "author": "rsefer",
   "categories": [
     "Productivity"
