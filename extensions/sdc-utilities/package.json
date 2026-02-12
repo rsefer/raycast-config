@@ -22,19 +22,26 @@
       "title": "SDC AI Test",
       "description": "AI testing script",
       "mode": "no-view"
+    },
+    {
+			"name": "latin-paragraph",
+      "title": "Generate Latin Paragraph",
+      "description": "Generate a random Latin paragraph (lorem ipsum) and paste it into the focused application",
+      "mode": "no-view",
+			"keywords": ["latin", "lorem", "ipsum"]
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.78.1",
-    "@raycast/utils": "^1.16.3"
+    "@raycast/api": "^1.104.6",
+    "@raycast/utils": "^2.2.2"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^1.0.8",
-    "@types/node": "20.14.10",
-    "@types/react": "18.3.3",
-    "eslint": "^9.6.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.5.3"
+    "@raycast/eslint-config": "^2.1.1",
+    "@types/node": "25.2.3",
+    "@types/react": "19.2.14",
+    "eslint": "^10.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "build": "ray build -e dist",
