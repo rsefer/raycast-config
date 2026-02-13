@@ -248,6 +248,16 @@ export default function RecentEpisodesCommand() {
     const title = episode.name?.trim() || "Untitled Episode";
 
     const accessories: List.Item.Accessory[] = [];
+
+    // Add release date first with calendar icon
+    if (episode.release_date) {
+      accessories.push({
+        date: new Date(episode.release_date),
+        tooltip: `Released ${episode.release_date}`
+      });
+    }
+
+    // Add duration or remaining time
     if (episode.duration_ms) {
       accessories.push({ text: formatEpisodeTime(episode.duration_ms) });
     }
@@ -256,9 +266,9 @@ export default function RecentEpisodesCommand() {
       if (episode.resume_point.fully_played) {
         accessories.push({ icon: { source: Icon.CheckCircle, tintColor: Color.Green }, tooltip: "Played" });
       } else if ((episode.resume_point.resume_position_ms ?? 0) > 0) {
-        if (episode.duration_ms && accessories.length > 0) {
-          const remaining = Math.max(0, episode.duration_ms - episode.resume_point.resume_position_ms);
-          accessories[0].text = `${formatEpisodeTime(remaining)} remaining`;
+        if (episode.duration_ms && accessories.length > 1) {
+          const remaining = Math.max(0, episode.duration_ms - (episode.resume_point.resume_position_ms || 0));
+          accessories[1].text = `${formatEpisodeTime(remaining)} remaining`;
         }
         accessories.push({ icon: { source: Icon.CircleProgress50, tintColor: Color.Blue }, tooltip: "In-progress" });
       }
@@ -268,7 +278,7 @@ export default function RecentEpisodesCommand() {
       <List.Item
         key={episode.id}
         title={title}
-        subtitle={episode.release_date}
+        subtitle={showName}
         icon={episode.images?.[0]?.url ? { source: episode.images[0].url } : Icon.Microphone}
         accessories={accessories}
         actions={
