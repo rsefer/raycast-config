@@ -1,7 +1,7 @@
 import { OAuth } from "@raycast/api";
 import { OAuthService } from "@raycast/utils";
 
-const clientId = "70d8d7021f0141419953c7c6570b20a9";
+const clientId = "c5db411f528a48cb810cb94ee001793d";
 
 const scope = [
   "playlist-modify-private",
@@ -22,15 +22,15 @@ const scope = [
 export const oauthClient = new OAuth.PKCEClient({
   redirectMethod: OAuth.RedirectMethod.Web,
   providerName: "Spotify",
-  providerIcon: "spotify-icon.svg",
+  providerIcon: "icon.svg",
   description: "Connect your Spotify account",
   providerId: "sdc-spotify",
 });
 
 export const provider = new OAuthService({
   client: oauthClient,
-  clientId,
-  scope,
+  clientId: clientId,
+  scope: scope,
   authorizeUrl: "https://accounts.spotify.com/authorize/",
   tokenUrl: "https://accounts.spotify.com/api/token",
   refreshTokenUrl: "https://accounts.spotify.com/api/token",
