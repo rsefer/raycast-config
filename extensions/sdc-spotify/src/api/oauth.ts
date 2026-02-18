@@ -48,7 +48,22 @@ async function fetchTokens(authRequest: OAuth.AuthorizationRequest, authorizatio
     throw new Error(`Spotify OAuth token request failed: ${response.status} ${response.statusText}`);
   }
 
-  const tokenResponse = (await response.json()) as OAuth.TokenResponse;
+  type SpotifyTokenResponse = {
+    access_token: string;
+    refresh_token?: string;
+    expires_in: number;
+    scope: string;
+    token_type: string;
+  };
+
+  const spotifyResponse = (await response.json()) as SpotifyTokenResponse;
+
+  const tokenResponse: OAuth.TokenResponse = {
+    access_token: spotifyResponse.access_token,
+    refresh_token: spotifyResponse.refresh_token,
+    expires_in: spotifyResponse.expires_in,
+  };
+
   return tokenResponse;
 }
 
@@ -69,8 +84,22 @@ async function refreshTokens(refreshToken: string): Promise<OAuth.TokenResponse 
     return null;
   }
 
-  const tokenResponse = (await response.json()) as OAuth.TokenResponse;
-  tokenResponse.refresh_token = tokenResponse.refresh_token ?? refreshToken;
+  type SpotifyTokenResponse = {
+    access_token: string;
+    refresh_token?: string;
+    expires_in: number;
+    scope: string;
+    token_type: string;
+  };
+
+  const spotifyResponse = (await response.json()) as SpotifyTokenResponse;
+
+  const tokenResponse: OAuth.TokenResponse = {
+    access_token: spotifyResponse.access_token,
+    refresh_token: spotifyResponse.refresh_token ?? refreshToken,
+    expires_in: spotifyResponse.expires_in,
+  };
+
   return tokenResponse;
 }
 
@@ -85,9 +114,8 @@ export const provider = {
           await oauthClient.setTokens(refreshed);
           return refreshed.access_token;
         }
-
         await oauthClient.removeTokens();
-      } else {
+      } else if (tokenSet.accessToken) {
         return tokenSet.accessToken;
       }
     }

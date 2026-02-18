@@ -34,11 +34,9 @@ function chunkArray<T>(items: T[], size: number) {
 }
 
 async function refreshData() {
-  console.log("Background refresh started");
 
   // Only refresh during active hours
   if (!isWithinActiveHours()) {
-    console.log("Outside active hours (7am-7pm), skipping refresh");
     return;
   }
 
@@ -51,7 +49,6 @@ async function refreshData() {
 
     // Update shows cache
     await setCacheEntry(SHOWS_CACHE_KEY, showsResult.items);
-    console.log(`Refreshed ${showsResult.items.length} shows`);
 
     // Build episodes cache with the same logic as recent-episodes.tsx
     const shows = showsResult.items;
@@ -123,7 +120,6 @@ async function refreshData() {
       savedEpisodes: savedEpisodeItemsWithDetails,
       recentEpisodes: recentEpisodeItemsWithDetails,
     });
-    console.log(`Refreshed ${savedEpisodes.length} saved episodes and ${recentEpisodeItems.length} recent episodes`);
 
     if (environment.launchType === LaunchType.UserInitiated) {
       await showHUD("✓ Spotify data refreshed");
