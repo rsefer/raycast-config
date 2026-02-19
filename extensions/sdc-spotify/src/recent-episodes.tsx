@@ -258,7 +258,7 @@ export default function RecentEpisodesCommand() {
     }
 
     // Add duration or remaining time
-    if (episode.duration_ms) {
+    if (!episode.resume_point?.fully_played && episode.duration_ms) {
       accessories.push({ text: formatEpisodeTime(episode.duration_ms) });
     }
 
