@@ -1,4 +1,4 @@
-import { provider } from "./oauth";
+import { spotifyRequest } from "../helpers/spotify-client";
 import { SimplifiedEpisode } from "./show-episodes";
 
 type EpisodeDetail = SimplifiedEpisode & {
@@ -22,32 +22,16 @@ export async function getEpisodesDetails(episodeIds: string[]): Promise<Map<stri
     return new Map();
   }
 
-  const accessToken = await provider.authorize();
   const uniqueIds = [...new Set(episodeIds)];
   const chunks = chunkArray(uniqueIds, BATCH_SIZE);
   const results = new Map<string, EpisodeDetail>();
 
-  // The batch endpoint GET /episodes?ids=... is being removed
-  // Use individual GET /episodes/{id} calls instead
   for (const chunk of chunks) {
     const promises = chunk.map(async (episodeId) => {
-      const url = `https://api.spotify.com/v1/episodes/${encodeURIComponent(episodeId)}`;
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        // Skip episodes that fail (e.g., not available in market)
-        return null;
-      }
-
-      return (await response.json()) as EpisodeDetail;
+			return await spotifyRequest(`episodes/${encodeURIComponent(episodeId)}`);
     });
 
-    const episodes = await Promise.all(promises);
+    const episodes = await Promise.all(promises) as EpisodeDetail[];
 
     for (const episode of episodes) {
       if (episode?.id) {

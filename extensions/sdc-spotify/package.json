@@ -11,12 +11,6 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "connect-spotify",
-      "title": "Connect Spotify",
-      "description": "Authenticate with Spotify",
-      "mode": "view"
-    },
-    {
       "name": "user-shows",
       "title": "Saved Shows",
       "description": "Browse your saved Spotify shows",

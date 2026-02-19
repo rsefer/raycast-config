@@ -1,4 +1,4 @@
-import { provider } from "./oauth";
+import { spotifyRequest } from "../helpers/spotify-client";
 
 export type SimplifiedEpisode = {
   id: string;
@@ -33,7 +33,6 @@ type GetShowEpisodesOptions = {
 };
 
 export async function getShowEpisodes({ showId, limit = 3, offset = 0, market }: GetShowEpisodesOptions) {
-  const accessToken = await provider.authorize();
   const params = new URLSearchParams();
   params.set("limit", String(limit));
   if (offset > 0) {
@@ -44,18 +43,8 @@ export async function getShowEpisodes({ showId, limit = 3, offset = 0, market }:
   }
 
   const query = params.toString();
-  const url = `https://api.spotify.com/v1/shows/${encodeURIComponent(showId)}/episodes${query ? `?${query}` : ""}`;
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+	const response = await spotifyRequest(`shows/${encodeURIComponent(showId)}/episodes${query ? `?${query}` : ""}`);
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Spotify show episodes failed: ${response.status} ${body}`);
-  }
-
-  return (await response.json()) as EpisodesResponse;
+  return (response) as EpisodesResponse;
 }

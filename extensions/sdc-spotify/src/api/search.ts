@@ -1,4 +1,4 @@
-import { provider } from "./oauth";
+import { spotifyRequest } from "../helpers/spotify-client";
 
 export type SearchResultItem = {
   id: string;
@@ -27,23 +27,13 @@ type SearchResponse = {
 };
 
 export async function searchSpotify(query: string, types: string[] = ["track", "artist", "album", "playlist", "show", "episode", "audiobook"], limit: number = 50): Promise<SearchResultItem[]> {
-  const accessToken = await provider.authorize();
 
   const typeString = types.join(",");
   const encodedQuery = encodeURIComponent(query);
-  const url = `https://api.spotify.com/v1/search?q=${encodedQuery}&type=${typeString}&limit=${limit}`;
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const response = await spotifyRequest(`search?q=${encodedQuery}&type=${typeString}&limit=${limit}`);
 
-  if (!response.ok) {
-    throw new Error(`Failed to search Spotify: ${response.statusText}`);
-  }
-
-  const data: SearchResponse = await response.json();
+	const data = response as SearchResponse;
 
   const results: SearchResultItem[] = [];
 

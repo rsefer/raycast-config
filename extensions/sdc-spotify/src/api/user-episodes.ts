@@ -1,4 +1,4 @@
-import { provider } from "./oauth";
+import { apiBase, spotifyRequest } from "../helpers/spotify-client";
 import { SimplifiedShow } from "./user-shows";
 
 const DEFAULT_LIMIT = 50;
@@ -57,37 +57,31 @@ type FetchPageOptions = {
 };
 
 async function fetchEpisodesPage(
-  accessToken: string,
   { limit = DEFAULT_LIMIT, offset = 0, market, url }: FetchPageOptions = {},
 ): Promise<SavedEpisodesPage> {
   let requestUrl = url;
 
-  if (!requestUrl) {
-    const params = new URLSearchParams();
-    params.set("limit", String(limit));
-    if (offset > 0) {
-      params.set("offset", String(offset));
-    }
-    if (market) {
-      params.set("market", market);
-    }
+  if (requestUrl) {
+		if (requestUrl.startsWith(apiBase)) {
+			requestUrl = requestUrl.replace(apiBase, "");
+		}
+	} else {
+		const params = new URLSearchParams();
+		params.set("limit", String(limit));
+		if (offset > 0) {
+			params.set("offset", String(offset));
+		}
+		if (market) {
+			params.set("market", market);
+		}
 
-    const query = params.toString();
-    requestUrl = `https://api.spotify.com/v1/me/episodes${query ? `?${query}` : ""}`;
-  }
+		const query = params.toString();
+		requestUrl = `me/episodes${query ? `?${query}` : ""}`;
+	}
 
-  const response = await fetch(requestUrl, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const response = await spotifyRequest(requestUrl);
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Spotify /me/episodes failed: ${response.status} ${body}`);
-  }
-
-  const data = (await response.json()) as SavedEpisodesResponse;
+  const data = response as SavedEpisodesResponse;
 
   // Normalize to just the episode objects, since the endpoint returns saved episode items.
   const episodes = (data.items ?? [])
@@ -101,18 +95,16 @@ async function fetchEpisodesPage(
 }
 
 export async function getUserEpisodes({ limit = DEFAULT_LIMIT, offset = 0, market }: GetUserEpisodesOptions = {}) {
-  const accessToken = await provider.authorize();
-  return fetchEpisodesPage(accessToken, { limit, offset, market });
+  return fetchEpisodesPage({ limit, offset, market });
 }
 
 export async function getAllUserEpisodes({ limit = DEFAULT_LIMIT, market }: GetAllUserEpisodesOptions = {}) {
-  const accessToken = await provider.authorize();
-  let page = await fetchEpisodesPage(accessToken, { limit, offset: 0, market });
+  let page = await fetchEpisodesPage({ limit, offset: 0, market });
   const items = [...page.items];
   let nextUrl = page.next ?? null;
 
   while (nextUrl) {
-    page = await fetchEpisodesPage(accessToken, { url: nextUrl });
+    page = await fetchEpisodesPage({ url: nextUrl });
     if (page.items.length > 0) {
       items.push(...page.items);
     }

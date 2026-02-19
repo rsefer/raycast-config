@@ -1,7 +1,6 @@
-import { provider } from "./oauth";
+import { apiBase, spotifyRequest, error404 } from "../helpers/spotify-client";
 
 const DEFAULT_LIMIT = 50;
-const AUDIOBOOKS_LOOKUP_LIMIT = 50;
 
 export type SimplifiedShow = {
 	id: string;
@@ -64,27 +63,19 @@ function chunkArray<T>(items: T[], size: number) {
 	return chunks;
 }
 
-async function getAudiobookIds(accessToken: string, ids: string[]) {
+async function getAudiobookIds(ids: string[]) {
 	const audiobookIds = new Set<string>();
-	const chunks = chunkArray(ids, AUDIOBOOKS_LOOKUP_LIMIT);
+	const chunks = chunkArray(ids, DEFAULT_LIMIT);
 
-	// The batch endpoint GET /audiobooks?ids=... is being removed
-	// Use individual GET /audiobooks/{id} calls instead
 	for (const chunk of chunks) {
 		const promises = chunk.map(async (audiobookId) => {
-			const url = `https://api.spotify.com/v1/audiobooks/${encodeURIComponent(audiobookId)}`;
-			const response = await fetch(url, {
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-			});
+			const response = await spotifyRequest(`audiobooks/${encodeURIComponent(audiobookId)}`);
 
-			if (!response.ok) {
-				// Item is not an audiobook or not available
+			if (response === error404) { // If the request fails (e.g., 404 Not Found), we assume it's not an audiobook and skip it.
 				return null;
 			}
 
-			const data = (await response.json()) as { id: string };
+			const data = response as { id: string };
 			return data.id;
 		});
 
@@ -99,24 +90,27 @@ async function getAudiobookIds(accessToken: string, ids: string[]) {
 	return audiobookIds;
 }
 
-async function excludeAudiobooks(accessToken: string, shows: SimplifiedShow[]) {
+async function excludeAudiobooks(shows: SimplifiedShow[]) {
 	if (shows.length === 0) {
 		return shows;
 	}
 
 	const ids = [...new Set(shows.map((show) => show.id))];
-	const audiobookIds = await getAudiobookIds(accessToken, ids);
+	const audiobookIds = await getAudiobookIds(ids);
 
 	return shows.filter((show) => !audiobookIds.has(show.id));
 }
 
 async function fetchShowsPage(
-	accessToken: string,
 	{ limit = DEFAULT_LIMIT, offset = 0, market, url }: FetchPageOptions = {},
 ): Promise<SavedShowsPage> {
 	let requestUrl = url;
 
-	if (!requestUrl) {
+	if (requestUrl) {
+		if (requestUrl.startsWith(apiBase)) {
+			requestUrl = requestUrl.replace(apiBase, "");
+		}
+	} else {
 		const params = new URLSearchParams();
 		params.set("limit", String(limit));
 		if (offset > 0) {
@@ -127,21 +121,12 @@ async function fetchShowsPage(
 		}
 
 		const query = params.toString();
-		requestUrl = `https://api.spotify.com/v1/me/shows${query ? `?${query}` : ""}`;
+		requestUrl = `me/shows${query ? `?${query}` : ""}`;
 	}
 
-	const response = await fetch(requestUrl, {
-		headers: {
-			Authorization: `Bearer ${accessToken}`,
-		},
-	});
+	const response = await spotifyRequest(requestUrl);
 
-	if (!response.ok) {
-		const body = await response.text();
-		throw new Error(`Spotify /me/shows failed: ${response.status} ${body}`);
-	}
-
-	const data = (await response.json()) as SavedShowsResponse;
+	const data = response as SavedShowsResponse;
 
 	// Normalize to just the show objects, since the endpoint returns saved show items.
 	const shows = (data.items ?? []).map((item) => item.show);
@@ -153,9 +138,8 @@ async function fetchShowsPage(
 }
 
 export async function getUserShows({ limit = 50, offset = 0, market }: GetUserShowsOptions = {}) {
-	const accessToken = await provider.authorize();
-	const page = await fetchShowsPage(accessToken, { limit, offset, market });
-	const items = await excludeAudiobooks(accessToken, page.items);
+	const page = await fetchShowsPage({ limit, offset, market });
+	const items = await excludeAudiobooks(page.items);
 
 	return {
 		...page,
@@ -164,20 +148,19 @@ export async function getUserShows({ limit = 50, offset = 0, market }: GetUserSh
 }
 
 export async function getAllUserShows({ limit = DEFAULT_LIMIT, market }: GetAllUserShowsOptions = {}) {
-	const accessToken = await provider.authorize();
-	let page = await fetchShowsPage(accessToken, { limit, offset: 0, market });
+	let page = await fetchShowsPage({ limit, offset: 0, market });
 	const items = [...page.items];
 	let nextUrl = page.next ?? null;
 
 	while (nextUrl) {
-		page = await fetchShowsPage(accessToken, { url: nextUrl });
+		page = await fetchShowsPage({ url: nextUrl });
 		if (page.items.length > 0) {
 			items.push(...page.items);
 		}
 		nextUrl = page.next ?? null;
 	}
 
-	const filteredItems = await excludeAudiobooks(accessToken, items);
+	const filteredItems = await excludeAudiobooks(items);
 
 	return {
 		items: filteredItems,
