@@ -1,7 +1,7 @@
 import { LocalStorage, closeMainWindow, Toast, showToast, getPreferenceValues } from "@raycast/api";
 import { exec } from "child_process";
 import { Timer, Preferences } from "./types";
-import { promises as fs } from "fs";
+import { close, promises as fs } from "fs";
 import { getClients } from "./get-clients";
 import moment from "moment";
 
@@ -93,6 +93,7 @@ export async function logTime(id: number, name: string | null, durationMinutes: 
 	);
 	let allClients = await getClients();
 	let thisClient = allClients.find(c => c.id == id);
+	await closeMainWindow();
 	await notify(`✏️ Logged ${name}: ${durationMinutes} minutes. Total Time: ${formatDuration(minutesToMilliseconds((thisClient?.minutes || 0)), 'short')}.`);
 	return true;
 }
