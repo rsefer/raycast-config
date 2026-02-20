@@ -1,4 +1,4 @@
-import { LocalStorage, showHUD, Toast, showToast, getPreferenceValues } from "@raycast/api";
+import { LocalStorage, closeMainWindow, Toast, showToast, getPreferenceValues } from "@raycast/api";
 import { exec } from "child_process";
 import { Timer, Preferences } from "./types";
 import { promises as fs } from "fs";
@@ -27,6 +27,7 @@ export async function startTimer(id: number | string, name: string | null = null
 	await toggleASFocusMode();
 	await LocalStorage.setItem(storageKeys.timer, JSON.stringify(timer));
 	await LocalStorage.setItem(storageKeys.notifications, JSON.stringify([]));
+	await closeMainWindow();
 	await notify(`🕐 Started ${timer.name}`);
 	return timer;
 }
@@ -46,7 +47,7 @@ export async function updateTimer(): Promise<Timer | null> {
 			spentNotifications = JSON.parse(spentNotificationsRaw);
 		}
 		if (!spentNotifications.includes(timer.diffMinutes)) {
-			shouldNotify = true;
+			// shouldNotify = true;
 			spentNotifications.push(timer.diffMinutes);
 			await LocalStorage.setItem(storageKeys.notifications, JSON.stringify(spentNotifications));
 		}
@@ -132,5 +133,8 @@ export function formatDuration(duration: number, format: string = 'long'): strin
 }
 
 export async function notify(message: string) {
-	await showHUD(message);
+	await showToast({
+		style: Toast.Style.Success,
+		title: message
+	});
 }
