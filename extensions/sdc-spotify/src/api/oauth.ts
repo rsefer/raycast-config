@@ -31,8 +31,34 @@ export const provider = new OAuthService({
   client: oauthClient,
   clientId: clientId,
   scope: scope,
-  authorizeUrl: "https://accounts.spotify.com/authorize/",
+  authorizeUrl: "https://accounts.spotify.com/authorize",
   tokenUrl: "https://accounts.spotify.com/api/token",
   refreshTokenUrl: "https://accounts.spotify.com/api/token",
   bodyEncoding: "url-encoded",
 });
+
+let pendingAuthorization: Promise<string> | null = null;
+
+export async function getSpotifyAccessToken() {
+  if (pendingAuthorization) {
+    return pendingAuthorization;
+  }
+
+  pendingAuthorization = provider
+    .authorize()
+    .catch(async (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+
+      if (message.includes("code_verifier was incorrect")) {
+        await oauthClient.removeTokens();
+        return provider.authorize();
+      }
+
+      throw error;
+    })
+    .finally(() => {
+      pendingAuthorization = null;
+    });
+
+  return pendingAuthorization;
+}

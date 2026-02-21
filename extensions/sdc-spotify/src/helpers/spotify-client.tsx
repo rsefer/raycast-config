@@ -1,4 +1,4 @@
-import { provider } from "../api/oauth";
+import { getSpotifyAccessToken } from "../api/oauth";
 
 export const apiBase = "https://api.spotify.com/v1/";
 
@@ -8,7 +8,7 @@ export async function spotifyRequest(path: string) {
 	if (!path) {
 		throw new Error("Path is required for spotifyRequest");
 	}
-	const accessToken = await provider.authorize();
+	const accessToken = await getSpotifyAccessToken();
 	const response = await fetch(`${apiBase}${path}`, {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
