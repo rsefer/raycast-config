@@ -98,17 +98,17 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.102.3",
-    "@raycast/utils": "^2.2.0",
-    "csv-parse": "^6.1.0",
+    "@raycast/api": "^1.104.11",
+    "@raycast/utils": "^2.2.3",
+    "csv-parse": "^6.2.1",
     "moment": "^2.30.1"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^2.0.4",
+    "@raycast/eslint-config": "^2.1.1",
     "@types/node": "^24.1.0",
-    "@types/react": "^19.1.9",
+    "@types/react": "^19.2.14",
     "eslint": "^9.32.0",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.2"
   },
   "scripts": {
