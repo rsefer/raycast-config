@@ -100,7 +100,6 @@
   "dependencies": {
     "@raycast/api": "^1.102.3",
     "@raycast/utils": "^2.2.0",
-    "axios": "^1.11.0",
     "csv-parse": "^6.1.0",
     "moment": "^2.30.1"
   },

@@ -3,7 +3,7 @@ import { Preferences, CacheClients, Client } from "./types";
 import { promises as fs, read } from "fs";
 import { pipeline } from 'stream/promises';
 import { parse } from 'csv-parse';
-import axios from 'axios';
+
 import { formatDuration, minutesToMilliseconds } from "./Timer";
 
 const cache = new Cache();
@@ -27,14 +27,19 @@ export async function getClients(forceRefresh: Boolean = false) {
     title: "Refreshing client list",
   });
 
-	let response = { data: [] };
+	let responseData: any[] = [];
 	try {
 		const preferences = getPreferenceValues<Preferences>();
-		response = await axios.get(`${preferences.domain}${preferences.endpoint}?access_token=${preferences.accessToken}&sortBy=recentActivityDate`);
-		cache.set(cacheKey, JSON.stringify({ timestamp: Date.now(), clients: response.data }));
+		const url = `${preferences.domain}${preferences.endpoint}?access_token=${preferences.accessToken}&sortBy=recentActivityDate`;
+		const res = await fetch(url);
+		if (!res.ok) {
+			throw new Error(`HTTP error! status: ${res.status}`);
+		}
+		responseData = await res.json();
+		cache.set(cacheKey, JSON.stringify({ timestamp: Date.now(), clients: responseData }));
 		await showToast({
 			title: "Client list updated",
-			message: `${response.data.length} clients`
+			message: `${responseData.length} clients`
 		});
 	} catch (err) {
 		await showToast({
@@ -42,8 +47,8 @@ export async function getClients(forceRefresh: Boolean = false) {
 			title: "Failed to refresh client list"
 		});
 	}
-	await assignClientMinutes(response.data);
-  return response.data;
+	await assignClientMinutes(responseData);
+	return responseData;
 }
 
 export async function readCSV(filePath:string) {
