@@ -1,12 +1,14 @@
 import { Action, ActionPanel, Icon, List, Toast, showToast } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import { getCacheEntry, isCacheFresh, setCacheEntry } from "./api/cache";
+import { getShowEpisodes } from "./api/show-episodes";
 import { getAllUserShows, SimplifiedShow } from "./api/user-shows";
 import { openSpotifyUri } from "./helpers/spotify-applescript";
 
 type ViewState = {
   isLoading: boolean;
   shows: SimplifiedShow[];
+  latestEpisodeDates: Map<string, string>;
   error?: string;
 };
 
@@ -16,9 +18,18 @@ type LoadOptions = {
 
 const CACHE_KEY = "spotify-podcasts-user-shows";
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const SHOW_BATCH_SIZE = 10;
+
+function chunkArray<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+}
 
 export default function UserShowsCommand() {
-  const [state, setState] = useState<ViewState>({ isLoading: true, shows: [] });
+  const [state, setState] = useState<ViewState>({ isLoading: true, shows: [], latestEpisodeDates: new Map() });
 
   const loadShows = useCallback(async ({ forceRefresh = false }: LoadOptions = {}) => {
     let cachedShows: SimplifiedShow[] | null = null;
@@ -41,8 +52,30 @@ export default function UserShowsCommand() {
 
     try {
       const { items } = await getAllUserShows();
-      setState({ isLoading: false, shows: items });
+      setState((previous) => ({ ...previous, isLoading: true, shows: items }));
       await setCacheEntry(CACHE_KEY, items);
+
+      // Batch-fetch the latest episode for each show to get release dates
+      const latestEpisodeDates = new Map<string, string>();
+      const batches = chunkArray(items, SHOW_BATCH_SIZE);
+      for (const batch of batches) {
+        await Promise.all(
+          batch.map(async (show) => {
+            try {
+              const response = await getShowEpisodes({ showId: show.id, limit: 1 });
+              const latestEpisode = response.items?.[0];
+              if (latestEpisode?.release_date) {
+                latestEpisodeDates.set(show.id, latestEpisode.release_date);
+              }
+            } catch {
+              // Silently skip shows that fail
+            }
+          }),
+        );
+        setState((previous) => ({ ...previous, latestEpisodeDates: new Map(latestEpisodeDates) }));
+      }
+
+      setState((previous) => ({ ...previous, isLoading: false }));
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
@@ -68,31 +101,41 @@ export default function UserShowsCommand() {
 
   return (
     <List isLoading={state.isLoading} searchBarPlaceholder="Search saved shows">
-      {state.shows.map((show) => (
-        <List.Item
-          key={show.id}
-          title={show.name}
-          subtitle={show.publisher}
-          accessories={show.total_episodes ? [{ text: `${show.total_episodes} episodes` }] : undefined}
-          icon={show.images?.[0]?.url ? { source: show.images[0].url } : Icon.Microphone}
-          actions={
-            <ActionPanel>
-              {show.uri ? (
-                <Action
-                  title="Open in Spotify"
-                  icon={Icon.Music}
-                  onAction={() => void openSpotifyUri(show.uri!)}
-                />
-              ) : null}
-              {show.external_urls?.spotify ? (
-                <Action.OpenInBrowser title="Open in Web Browser" url={show.external_urls.spotify} />
-              ) : null}
-              <Action title="Refresh" icon={Icon.ArrowClockwise} onAction={() => void loadShows({ forceRefresh: true })} />
-              <Action.CopyToClipboard title="Copy Show Name" content={show.name} />
-            </ActionPanel>
-          }
-        />
-      ))}
+      {state.shows.map((show) => {
+        const latestDate = state.latestEpisodeDates.get(show.id);
+        const accessories: List.Item.Accessory[] = [];
+        if (latestDate) {
+          accessories.push({ date: new Date(latestDate), tooltip: `Latest episode: ${latestDate}` });
+        }
+        if (show.total_episodes) {
+          accessories.push({ text: `${show.total_episodes} eps` });
+        }
+        return (
+          <List.Item
+            key={show.id}
+            title={show.name}
+            subtitle={show.publisher}
+            accessories={accessories.length > 0 ? accessories : undefined}
+            icon={show.images?.[0]?.url ? { source: show.images[0].url } : Icon.Microphone}
+            actions={
+              <ActionPanel>
+                {show.uri ? (
+                  <Action
+                    title="Open in Spotify"
+                    icon={Icon.Music}
+                    onAction={() => void openSpotifyUri(show.uri!)}
+                  />
+                ) : null}
+                {show.external_urls?.spotify ? (
+                  <Action.OpenInBrowser title="Open in Web Browser" url={show.external_urls.spotify} />
+                ) : null}
+                <Action title="Refresh" icon={Icon.ArrowClockwise} onAction={() => void loadShows({ forceRefresh: true })} />
+                <Action.CopyToClipboard title="Copy Show Name" content={show.name} />
+              </ActionPanel>
+            }
+          />
+        );
+      })}
       <List.EmptyView
         title={emptyTitle}
         description={emptyDescription}

@@ -1,7 +1,8 @@
 import { Action, ActionPanel, Color, Icon, List, Toast, showToast } from "@raycast/api";
 import { useCallback, useRef, useState } from "react";
+import { addToQueue } from "./api/queue";
 import { searchSpotify, SearchResultItem } from "./api/search";
-import { openSpotifyUri } from "./helpers/spotify-applescript";
+import { openSpotifyUri, playSpotifyUri } from "./helpers/spotify-applescript";
 
 type ViewState = {
   isLoading: boolean;
@@ -168,6 +169,28 @@ export default function SearchSpotifyCommand() {
               icon={result.images?.[0]?.url ? { source: result.images[0].url } : getIcon(result.type)}
               actions={
                 <ActionPanel>
+                  {result.uri && (result.type === "track" || result.type === "episode") ? (
+                    <Action
+                      title="Play in Spotify"
+                      icon={Icon.Play}
+                      onAction={() => void playSpotifyUri(result.uri!)}
+                    />
+                  ) : null}
+                  {result.uri && (result.type === "track" || result.type === "episode") ? (
+                    <Action
+                      title="Add to Queue"
+                      icon={Icon.Plus}
+                      shortcut={{ modifiers: ["cmd"], key: "q" }}
+                      onAction={async () => {
+                        try {
+                          await addToQueue(result.uri!);
+                          await showToast({ style: Toast.Style.Success, title: "Added to queue" });
+                        } catch {
+                          await showToast({ style: Toast.Style.Failure, title: "Failed to add to queue", message: "Make sure Spotify is playing on a device" });
+                        }
+                      }}
+                    />
+                  ) : null}
                   {result.uri ? (
                     <Action
                       title="Open in Spotify"

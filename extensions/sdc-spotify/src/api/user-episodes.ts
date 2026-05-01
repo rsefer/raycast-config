@@ -3,7 +3,7 @@ import { SimplifiedShow } from "./user-shows";
 
 const DEFAULT_LIMIT = 50;
 
-type EpisodeShow = Pick<SimplifiedShow, "id" | "name" | "external_urls" | "images">;
+type EpisodeShow = Pick<SimplifiedShow, "id" | "name" | "external_urls" | "images" | "uri">;
 
 export type SimplifiedEpisode = {
   id: string;

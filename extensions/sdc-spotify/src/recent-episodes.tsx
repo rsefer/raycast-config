@@ -2,6 +2,7 @@ import { Action, ActionPanel, Color, Icon, List, Toast, showToast } from "@rayca
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCacheEntry, isCacheFresh, setCacheEntry } from "./api/cache";
 import { getEpisodesDetails } from "./api/episode-details";
+import { addToQueue } from "./api/queue";
 import { getShowEpisodes, SimplifiedEpisode } from "./api/show-episodes";
 import { getAllUserEpisodes } from "./api/user-episodes";
 import { getAllUserShows, SimplifiedShow } from "./api/user-shows";
@@ -11,6 +12,7 @@ type EpisodeListItem = {
   episode: SimplifiedEpisode;
   showName?: string;
   showUrl?: string;
+  showUri?: string;
   isSaved?: boolean;
 };
 
@@ -91,6 +93,7 @@ export default function RecentEpisodesCommand() {
         episode,
         showName: episode.show?.name,
         showUrl: episode.show?.external_urls?.spotify,
+        showUri: episode.show?.uri,
         isSaved: true,
       }));
       const savedById = new Map(cleanedSavedEpisodes.map((episode) => [episode.id, episode]));
@@ -121,6 +124,7 @@ export default function RecentEpisodesCommand() {
                 episode: entry.episode,
                 showName: entry.show.name,
                 showUrl: entry.show.external_urls?.spotify,
+                showUri: entry.show.uri,
                 isSaved: savedIds.has(entry.episode.id),
               });
             }
@@ -144,7 +148,7 @@ export default function RecentEpisodesCommand() {
         };
       });
 
-      // Merge resume_point into recent episodes
+      // Merge resume_point into recent episodes (preserve showUri)
       const recentEpisodeItemsWithDetails = recentEpisodeItems.map((item) => {
         const details = episodeDetailsMap.get(item.episode.id);
         return {
@@ -244,7 +248,7 @@ export default function RecentEpisodesCommand() {
     ? "Check your Spotify connection and try again."
     : "Save shows in Spotify to see their latest episodes.";
 
-  const renderEpisodeItem = ({ episode, showName, showUrl, isSaved }: EpisodeListItem) => {
+  const renderEpisodeItem = ({ episode, showName, showUrl, showUri, isSaved }: EpisodeListItem) => {
     const title = episode.name?.trim() || "Untitled Episode";
 
     const accessories: List.Item.Accessory[] = [];
@@ -290,6 +294,21 @@ export default function RecentEpisodesCommand() {
                 onAction={() => void playSpotifyUri(episode.uri!)}
               />
             ) : null}
+            {episode.uri ? (
+              <Action
+                title="Add to Queue"
+                icon={Icon.Plus}
+                shortcut={{ modifiers: ["cmd"], key: "q" }}
+                onAction={async () => {
+                  try {
+                    await addToQueue(episode.uri!);
+                    await showToast({ style: Toast.Style.Success, title: "Added to queue" });
+                  } catch {
+                    await showToast({ style: Toast.Style.Failure, title: "Failed to add to queue", message: "Make sure Spotify is playing on a device" });
+                  }
+                }}
+              />
+            ) : null}
 						{episode.uri ? (
 							<Action
 								title="Open in Spotify"
@@ -297,6 +316,14 @@ export default function RecentEpisodesCommand() {
 								onAction={() => void openSpotifyUri(episode.uri!)}
 							/>
 						) : null}
+            {showUri ? (
+              <Action
+                title="Open Show in Spotify"
+                icon={Icon.Microphone}
+                shortcut={{ modifiers: ["cmd", "shift"], key: "s" }}
+                onAction={() => void openSpotifyUri(showUri)}
+              />
+            ) : null}
             {episode.external_urls?.spotify ? (
               <Action.OpenInBrowser
 								title="Open in Web Browser"

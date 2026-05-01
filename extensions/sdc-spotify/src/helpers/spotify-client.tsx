@@ -22,3 +22,19 @@ export async function spotifyRequest(path: string) {
 	}
 	return await response.json();
 }
+
+export async function spotifyPost(path: string, body?: Record<string, unknown>) {
+	const accessToken = await getSpotifyAccessToken();
+	const response = await fetch(`${apiBase}${path}`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			"Content-Type": "application/json",
+		},
+		body: body ? JSON.stringify(body) : undefined,
+	});
+	if (response.status === 204 || response.status === 200) {
+		return;
+	}
+	throw new Error(`Spotify API request failed with status ${response.status}: ${response.statusText}`);
+}
