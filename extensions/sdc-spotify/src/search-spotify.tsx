@@ -125,6 +125,7 @@ export default function SearchSpotifyCommand() {
 
   const groupedResults = state.results.reduce(
     (acc, result) => {
+      if (!result.id || !result.name) return acc;
       const type = result.type;
       if (!acc[type]) {
         acc[type] = [];
