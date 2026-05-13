@@ -180,7 +180,7 @@ export default function SearchSpotifyCommand() {
                     <Action
                       title="Add to Queue"
                       icon={Icon.Plus}
-                      shortcut={{ modifiers: ["cmd"], key: "q" }}
+                      shortcut={{ modifiers: ["cmd"], key: "." }}
                       onAction={async () => {
                         try {
                           await addToQueue(result.uri!);
