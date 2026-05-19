@@ -52,7 +52,6 @@ export default function Command(context: LaunchProps) {
 			<Form.TextField
 				title="Minutes"
 				placeholder="60"
-				defaultValue="60"
 				autoFocus={true}
 				{...itemProps.minutes}
 			/>
