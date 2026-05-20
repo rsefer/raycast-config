@@ -134,8 +134,12 @@ export function formatDuration(duration: number, format: string = 'long'): strin
 }
 
 export async function notify(message: string) {
-	await showToast({
-		style: Toast.Style.Success,
-		title: message
-	});
+	try {
+		await showToast({
+			style: Toast.Style.Success,
+			title: message
+		});
+	} catch {
+		// Toasts are unavailable for background-launched Raycast commands.
+	}
 }
