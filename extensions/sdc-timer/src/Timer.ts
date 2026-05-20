@@ -141,5 +141,17 @@ export async function notify(message: string) {
 		});
 	} catch {
 		// Toasts are unavailable for background-launched Raycast commands.
+		await notifyMacOS(message);
 	}
+}
+
+async function notifyMacOS(message: string): Promise<void> {
+	const escapedMessage = escapeAppleScriptString(message);
+	await new Promise<void>((resolve) => {
+		exec(`osascript -e 'display notification "${escapedMessage}" with title "SDC Timer"'`, () => resolve());
+	});
+}
+
+function escapeAppleScriptString(value: string): string {
+	return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
