@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from "react";
-import { LaunchProps, Action, ActionPanel, List, launchCommand, LaunchType, Icon, Color, getPreferenceValues, open, popToRoot } from "@raycast/api";
+import { LaunchProps, Action, ActionPanel, List, launchCommand, LaunchType, Icon, Color, getPreferenceValues, open, popToRoot, closeMainWindow } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { Preferences, Client } from "./types";
 import { openHoursFile } from "./open-hours-file";
@@ -170,7 +170,6 @@ function StartTimer(props: { item: Client }) {
 			shortcut={{ modifiers: ["cmd"], key: "s" }}
 			onAction={() => {
 				startTimer(props.item.id, props.item.name);
-				popToRoot();
 			}}
 		/>
 	);
@@ -196,6 +195,7 @@ function NewInvoice(props: { item: Client }) {
 			onAction={() => {
 				open(`${preferences.domain}/invoices/new?client_id=${props.item.id}`);
 				popToRoot();
+				closeMainWindow();
 			}}
 		/>
 	);

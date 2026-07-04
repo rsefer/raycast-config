@@ -1,4 +1,4 @@
-import { LocalStorage, closeMainWindow, Toast, showToast, getPreferenceValues } from "@raycast/api";
+import { LocalStorage, closeMainWindow, Toast, showToast, getPreferenceValues, popToRoot } from "@raycast/api";
 import { exec } from "child_process";
 import { Timer, Preferences } from "./types";
 import { close, promises as fs } from "fs";
@@ -24,11 +24,11 @@ export async function startTimer(id: number | string, name: string | null = null
 			long: formatDuration(0, 'long')
 		}
 	};
-	await toggleASFocusMode();
 	await LocalStorage.setItem(storageKeys.timer, JSON.stringify(timer));
 	await LocalStorage.setItem(storageKeys.notifications, JSON.stringify([]));
 	await closeMainWindow();
 	await notify(`🕐 Started ${timer.name}`);
+	await toggleASFocusMode();
 	return timer;
 }
 
