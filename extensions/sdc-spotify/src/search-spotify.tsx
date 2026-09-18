@@ -47,7 +47,7 @@ type FilterValue = keyof typeof filters;
 export default function SearchSpotifyCommand() {
   const [state, setState] = useState<ViewState>({ isLoading: false, results: [] });
   const [typeFilter, setTypeFilter] = useState<FilterValue>("all");
-  const debounceTimerRef = useRef<NodeJS.Timeout>();
+  const debounceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleSearch = useCallback(async (query: string) => {
     // Clear any pending searches

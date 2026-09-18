@@ -16,6 +16,7 @@ export type SimplifiedShow = {
 	external_urls?: { spotify?: string };
 	uri?: string;
 	type?: "show";
+	publisher?: string;
 };
 
 type SavedShowItem = {

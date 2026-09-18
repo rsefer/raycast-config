@@ -272,7 +272,7 @@ export default function RecentEpisodesCommand() {
       } else if ((episode.resume_point.resume_position_ms ?? 0) > 0) {
         if (episode.duration_ms && accessories.length > 1) {
           const remaining = Math.max(0, episode.duration_ms - (episode.resume_point.resume_position_ms || 0));
-          accessories[1].text = `${formatEpisodeTime(remaining)} remaining`;
+          accessories[1] = { text: `${formatEpisodeTime(remaining)} remaining` };
         }
         accessories.push({ icon: { source: Icon.CircleProgress50, tintColor: Color.Blue }, tooltip: "In-progress" });
       }
