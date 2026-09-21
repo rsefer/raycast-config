@@ -24,7 +24,6 @@ export const oauthClient = new OAuth.PKCEClient({
   providerName: "Spotify",
   providerIcon: "icon.svg",
   description: "Connect your Spotify account",
-  providerId: "sdc-spotify",
 });
 
 export const provider = new OAuthService({
@@ -39,23 +38,31 @@ export const provider = new OAuthService({
 
 let pendingAuthorization: Promise<string> | null = null;
 
+async function authorizeWithRecovery(canRetry = true): Promise<string> {
+  try {
+    return await provider.authorize();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const canRecover =
+      message.includes("code_verifier was incorrect") ||
+      message.includes("Sign-in expired") ||
+      message.includes("state mismatch");
+
+    if (canRetry && canRecover) {
+      await oauthClient.removeTokens();
+      return authorizeWithRecovery(false);
+		}
+
+    throw error;
+  }
+}
+
 export async function getSpotifyAccessToken() {
   if (pendingAuthorization) {
     return pendingAuthorization;
   }
 
-  pendingAuthorization = provider
-    .authorize()
-    .catch(async (error) => {
-      const message = error instanceof Error ? error.message : String(error);
-
-      if (message.includes("code_verifier was incorrect")) {
-        await oauthClient.removeTokens();
-        return provider.authorize();
-      }
-
-      throw error;
-    })
+  pendingAuthorization = authorizeWithRecovery()
     .finally(() => {
       pendingAuthorization = null;
     });
