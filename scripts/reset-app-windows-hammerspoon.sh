@@ -12,5 +12,5 @@
 # @raycast.author rsefer
 # @raycast.authorURL https://raycast.com/rsefer
 
-open hammerspoon://reset_all_apps
+open hammerspoon2://reset_all_apps
 echo "Resetting Windows in Hammerspoon"
