@@ -103,7 +103,6 @@ export default function Command(context: LaunchProps) {
 					title={item.name}
 					subtitle={item.contact}
 					keywords={[item.contact]}
-					icon={item.logo}
 					accessories={item.accessories}
 					actions={<Actions item={item} timerType={workingTimerType} />}
 				/>
