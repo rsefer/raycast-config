@@ -13,7 +13,7 @@ export default async function (input: Input) {
 	return clients.map(client => {
 		return {
 			name: client.name,
-			url: `${preferences.domain}/invoices/new?client_id=${client.id}`,
+			url: `${preferences.domain_frontend}/invoices/new?client_id=${client.id}`,
 			time: client.timeFormatted,
 			lastEntryDateTime: client.lastEntryDateTime
 		};

@@ -28,7 +28,7 @@ export default function Command(context: LaunchProps) {
 		<Form
 			searchBarAccessory={
 				<Form.LinkAccessory
-					target={preferences.domain}
+					target={preferences.domain_frontend}
 					text="Go to Biz"
 				/>
 			}

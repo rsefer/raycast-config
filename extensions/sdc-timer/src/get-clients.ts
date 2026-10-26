@@ -30,12 +30,43 @@ export async function getClients(forceRefresh: Boolean = false) {
 	let responseData: any[] = [];
 	try {
 		const preferences = getPreferenceValues<Preferences>();
-		const url = `${preferences.domain}${preferences.endpoint}?access_token=${preferences.accessToken}&sortBy=recentActivityDate`;
-		const res = await fetch(url);
-		if (!res.ok) {
-			throw new Error(`HTTP error! status: ${res.status}`);
+		const endpoint = preferences.endpoint.replace(/^\/api(?=\/v1\/)/, "");
+		const apiDomain = preferences.apiDomain || preferences.domain;
+		const url = `${apiDomain}${endpoint}`;
+		const invoicesUrl = url.replace(/\/clients\/?$/, "/invoices");
+		const headers = { Authorization: `Bearer ${preferences.accessToken}` };
+		const [clientsResponse, invoicesResponse] = await Promise.all([
+			fetch(url, { headers }),
+			fetch(invoicesUrl, { headers }),
+		]);
+		if (!clientsResponse.ok || !invoicesResponse.ok) {
+			throw new Error(`HTTP error! status: ${clientsResponse.status}, ${invoicesResponse.status}`);
 		}
-		responseData = await res.json();
+		const [clientsPayload, invoicesPayload]: [unknown, unknown] = await Promise.all([
+			clientsResponse.json(),
+			invoicesResponse.json(),
+		]);
+		if (!Array.isArray(clientsPayload) || !Array.isArray(invoicesPayload)) {
+			throw new Error("Unexpected client list response");
+		}
+		const latestInvoiceDateByClient = new Map<number, string>();
+		for (const invoice of invoicesPayload) {
+			if (invoice.client_id && invoice.created_at) {
+				const clientId = Number(invoice.client_id);
+				const currentDate = latestInvoiceDateByClient.get(clientId);
+				if (!currentDate || new Date(invoice.created_at) > new Date(currentDate)) {
+					latestInvoiceDateByClient.set(clientId, invoice.created_at);
+				}
+			}
+		}
+		responseData = clientsPayload.map((client) => {
+			const latestInvoiceDate = latestInvoiceDateByClient.get(Number(client.id));
+			const createdAt = client.created_at;
+			const mostRecentActivityDate = latestInvoiceDate && (!createdAt || new Date(latestInvoiceDate) > new Date(createdAt))
+				? latestInvoiceDate
+				: createdAt;
+			return { ...client, mostRecentActivityDate };
+		});
 		cache.set(cacheKey, JSON.stringify({ timestamp: Date.now(), clients: responseData }));
 		await showToast({
 			title: "Client list updated",

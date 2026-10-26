@@ -42,13 +42,15 @@ export default function Command(context: LaunchProps) {
 	if (data) {
 		if (searchFilter == 'active') {
 			data = data.filter((client: Client) => {
-				const isRecentlyActive = new Date(client.mostRecentActivityDate) > PAST_COMPARISON;
+				const activityDate = client.mostRecentActivityDate || client.created_at;
+				const isRecentlyActive = activityDate ? new Date(activityDate) > PAST_COMPARISON : false;
 				const hasHoursEntry = clientsFromHours?.has(client.id) || false;
 				return isRecentlyActive || hasHoursEntry;
 			});
 		} else if (searchFilter == 'archived') {
 			data = data.filter((client: Client) => {
-				const isRecentlyActive = new Date(client.mostRecentActivityDate) > PAST_COMPARISON;
+				const activityDate = client.mostRecentActivityDate || client.created_at;
+				const isRecentlyActive = activityDate ? new Date(activityDate) > PAST_COMPARISON : false;
 				const hasHoursEntry = clientsFromHours?.has(client.id) || false;
 				return !isRecentlyActive && !hasHoursEntry;
 			});
@@ -140,7 +142,7 @@ function Actions(props: { item: Client, timerType: String }) {
 					title="Open on Biz"
 					icon={{ source: Icon.Globe }}
 					shortcut={{ modifiers: ["cmd"], key: "o" }}
-					url={`${preferences.domain}/clients/${props.item.id}`}
+					url={`${preferences.domain_frontend}/clients/${props.item.id}`}
 				/>
       </ActionPanel.Section>
 			<ActionPanel.Section>
@@ -192,7 +194,7 @@ function NewInvoice(props: { item: Client }) {
 			icon={{ source: Icon.BankNote, tintColor: Color.Yellow }}
 			shortcut={{ modifiers: ["cmd"], key: "i" }}
 			onAction={() => {
-				open(`${preferences.domain}/invoices/new?client_id=${props.item.id}`);
+				open(`${preferences.domain_frontend}/invoices/new?client_id=${props.item.id}`);
 				popToRoot();
 				closeMainWindow();
 			}}

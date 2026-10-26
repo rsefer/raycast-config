@@ -16,15 +16,31 @@
       "title": "Domain",
       "description": "Domain for API",
       "type": "textfield",
+      "placeholder": "https://api.example.com",
+      "required": true
+    },
+		{
+      "name": "domain_frontend",
+      "title": "Frontend Domain",
+      "description": "Domain for the frontend",
+      "type": "textfield",
       "placeholder": "https://example.com",
       "required": true
+    },
+    {
+      "name": "apiDomain",
+      "title": "API Domain",
+      "description": "Domain for the Biz API (defaults to Domain)",
+      "type": "textfield",
+      "placeholder": "https://api.example.com",
+      "required": false
     },
     {
       "name": "endpoint",
       "title": "Endpoint",
       "description": "Endpoint for API",
       "type": "textfield",
-      "placeholder": "/api/v1/clients",
+      "placeholder": "/v1/clients",
       "required": true
     },
     {

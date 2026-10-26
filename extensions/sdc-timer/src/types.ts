@@ -1,5 +1,7 @@
 export type Preferences = {
 	domain: string;
+	domain_frontend: string;
+	apiDomain?: string;
 	endpoint: string;
 	accessToken: string;
 	hoursFile: string;
@@ -15,6 +17,7 @@ export type Client = {
 	minutes: number;
 	timeFormatted: string;
 	mostRecentActivityDate: string;
+	created_at?: string;
 	lastEntryDateTime: string;
 	archived?: boolean;
 	accessories: Array<any>;
