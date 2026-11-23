@@ -28,12 +28,18 @@
       "required": true
     },
     {
-      "name": "endpoint",
-      "title": "Endpoint",
-      "description": "Endpoint for API",
-      "type": "textfield",
-      "placeholder": "/v1/clients",
-      "required": true
+      "name": "version",
+      "title": "Version",
+      "description": "Version of the Biz API",
+      "type": "dropdown",
+      "default": "v1",
+      "required": true,
+      "data": [
+        {
+          "title": "v1",
+          "value": "v1"
+        }
+      ]
     },
     {
       "name": "accessToken",
