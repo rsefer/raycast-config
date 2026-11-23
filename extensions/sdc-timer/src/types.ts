@@ -1,7 +1,6 @@
 export type Preferences = {
-	domain: string;
 	domain_frontend: string;
-	apiDomain?: string;
+	apiDomain: string;
 	endpoint: string;
 	accessToken: string;
 	hoursFile: string;

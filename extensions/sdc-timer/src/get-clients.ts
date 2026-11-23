@@ -31,8 +31,7 @@ export async function getClients(forceRefresh: Boolean = false) {
 	try {
 		const preferences = getPreferenceValues<Preferences>();
 		const endpoint = preferences.endpoint.replace(/^\/api(?=\/v1\/)/, "");
-		const apiDomain = preferences.apiDomain || preferences.domain;
-		const url = `${apiDomain}${endpoint}`;
+		const url = `${preferences.apiDomain}${endpoint}`;
 		const invoicesUrl = url.replace(/\/clients\/?$/, "/invoices");
 		const headers = { Authorization: `Bearer ${preferences.accessToken}` };
 		const [clientsResponse, invoicesResponse] = await Promise.all([

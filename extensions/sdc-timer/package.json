@@ -11,14 +11,6 @@
   ],
   "license": "MIT",
   "preferences": [
-    {
-      "name": "domain",
-      "title": "Domain",
-      "description": "Domain for API",
-      "type": "textfield",
-      "placeholder": "https://api.example.com",
-      "required": true
-    },
 		{
       "name": "domain_frontend",
       "title": "Frontend Domain",
@@ -30,10 +22,10 @@
     {
       "name": "apiDomain",
       "title": "API Domain",
-      "description": "Domain for the Biz API (defaults to Domain)",
+      "description": "Domain for the Biz API",
       "type": "textfield",
       "placeholder": "https://api.example.com",
-      "required": false
+      "required": true
     },
     {
       "name": "endpoint",
