@@ -314,6 +314,7 @@ export default function RecentEpisodesCommand() {
 								title="Open in Spotify"
 								icon={Icon.Music}
 								onAction={() => void openSpotifyUri(episode.uri!)}
+								shortcut={{ modifiers: ["cmd"], key: "s" }}
 							/>
 						) : null}
             {showUri ? (
@@ -335,7 +336,6 @@ export default function RecentEpisodesCommand() {
               <Action.OpenInBrowser
 								title="Open Show in Web Browser"
 								url={showUrl}
-								shortcut={{ modifiers: ["cmd"], key: "s" }}
 							/>
             ) : null}
             <Action
